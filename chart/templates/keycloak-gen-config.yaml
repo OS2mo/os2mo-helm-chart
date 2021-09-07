@@ -11,4 +11,6 @@ metadata:
   {{- toYaml . | nindent 4 }}
   {{- end }}
 data:
-{{ toYaml .Values.keycloak.builder.environment | indent 2 }}
+{{- range $key, $val := .Values.keycloak.builder.environment }}
+{{ $key | quote | indent 6}}: {{ $val | quote }}
+{{- end}}
