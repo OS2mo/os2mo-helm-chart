@@ -30,14 +30,14 @@ spec:
           imagePullPolicy: {{ .Values.os2mo.image.pullPolicy }}
           env:
             - name: PORT
-              value: "8080"
+              value: "5000"
 
             # Disable service platformen
             - name: DUMMY_MODE
               value: "true"
 
             - name: LORA_URL
-              value: "http://mox-service:80/"
+              value: "http://mox-service:8080/"
 
             # Confdb
             - name: CONF_DB_USE
@@ -56,7 +56,7 @@ spec:
               value: "{{ $protocol }}://{{ .Values.ingress.hostname }}/auth/"
 
           ports:
-            - containerPort: 80
+            - containerPort: 5000
           resources:
             requests:
               memory: "512Mi"

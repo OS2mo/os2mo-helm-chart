@@ -29,6 +29,9 @@ spec:
           image: "{{ .Values.lora.image.repository }}:{{ .Values.lora.image.tag }}"
           imagePullPolicy: {{ .Values.lora.image.pullPolicy }}
           env:
+            - name: PORT
+              value: "8080"
+
             - name: DB_HOST
               value: {{ .Values.database.host }}
             {{ if ne .Values.database.sslmode "" }}
@@ -47,7 +50,7 @@ spec:
             - name: DB_EXTENSIONS_PATH
               value: "oio_rest/oio_rest/db_extensions/mo-01.json"
           ports:
-            - containerPort: 80
+            - containerPort: 8080
           resources:
             requests:
               memory: "512Mi"
