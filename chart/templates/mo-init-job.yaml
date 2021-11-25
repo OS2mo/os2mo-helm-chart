@@ -1,0 +1,34 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: mo-init-job
+  labels:
+    app: mo
+  {{- with .Values.annotations }}
+  annotations:
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  template:
+    metadata:
+      labels:
+        app: mo
+    spec:
+      containers:
+        - name: os2mo-init
+          image: curlimages/curl
+          command: ["/bin/sh","-c"]
+          args: ["curl -ks http://mo-service:5000/not_found"]
+      initContainers:
+        - name: wait-for-mo
+          image: curlimages/curl
+          command: ["/bin/sh","-c"]
+          args: ['echo -e "Waiting for MO to be ready\c"; while [ $(curl -ksw "%{http_code}" "http://mo-service:5000/" -o /dev/null) -ne 200 ]; do sleep 1; echo -e ".\c"; done; echo "OK"']
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "5m"
+            limits:
+              memory: "128Mi"
+              cpu: "10m"
+      restartPolicy: Never
