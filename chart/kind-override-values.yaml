@@ -7,6 +7,20 @@ ingress:
   # Must be 'nginx' for basic-auth to work
   class: "ambassador"
 
+os2mo:
+  init:
+    enabled: true
+    config:
+      root_organisation:
+        name: xyz
+        user_key: 702d97ea-4e03-11ec-8163-c70f41b96b32
+      facets:
+        org_unit_address_type:
+          PhoneUnit:
+            title: "CVR"
+            scope: "CVR"
+      it_systems: {}
+
 keycloak:
   builder:
     lora_dipex_client_enabled: true

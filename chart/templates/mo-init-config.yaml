@@ -12,13 +12,5 @@ metadata:
   {{- end }}
 data:
   config: |
-    root_organisation:
-      name: xyz
-      user_key: 702d97ea-4e03-11ec-8163-c70f41b96b32
-    facets:
-      org_unit_address_type:
-        PhoneUnit:
-          title: "CVR"
-          scope: "CVR"
-    it_systems: {}
+{{ toYaml .Values.os2mo.init.config | indent 4}}
 {{- end }}
