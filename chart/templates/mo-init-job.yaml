@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: Magenta ApS
+#
+# SPDX-License-Identifier: MPL-2.0
+---
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -16,9 +20,31 @@ spec:
     spec:
       containers:
         - name: os2mo-init
-          image: curlimages/curl
-          command: ["/bin/sh","-c"]
-          args: ["curl -ks http://mo-service:5000/not_found"]
+          image: "{{ .Values.os2mo.init.image.repository }}:{{ .Values.os2mo.init.image.tag }}"
+          imagePullPolicy: {{ .Values.os2mo.init.image.pullPolicy }}
+          env:
+            - name: AUTH_SERVER
+              value: "http://keycloak-service:8080/auth"
+            - name: MO_URL
+              value: "http://mo-service:5000"
+            - name: CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: keycloak-dipex-secret
+                  key: client_secret
+            - name: LORA_URL
+              value: "http://mox-service:8080"
+            - name: LORA_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: keycloak-lora-dipex-secret
+                  key: client_secret
+            - name: LORA_AUTH_REALM
+              value: "lora"
+          volumeMounts:
+           - name: os2mo-init-config-volume
+             mountPath: /config
+             readOnly: true
       initContainers:
         - name: wait-for-mo
           image: curlimages/curl
@@ -31,4 +57,22 @@ spec:
             limits:
               memory: "128Mi"
               cpu: "10m"
+        - name: wait-for-keycloak
+          image: curlimages/curl
+          command: ["/bin/sh","-c"]
+          args: ['echo -e "Waiting for Keycloak to be ready\c"; while [ $(curl -ksw "%{http_code}" "http://keycloak-service:8080/auth/" -o /dev/null) -ne 200 ]; do sleep 1; echo -e ".\c"; done; echo "OK"']
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "5m"
+            limits:
+              memory: "128Mi"
+              cpu: "10m"
       restartPolicy: Never
+      volumes:
+        - name: os2mo-init-config-volume
+          configMap:
+            name: os2mo-init-config
+            items:
+              - key: config
+                path: config.yml

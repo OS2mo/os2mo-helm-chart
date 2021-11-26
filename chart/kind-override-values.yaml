@@ -1,0 +1,15 @@
+# SPDX-FileCopyrightText: Magenta ApS
+#
+# SPDX-License-Identifier: MPL-2.0
+---
+# Annotations to de applied to all resources
+ingress:
+  # Must be 'nginx' for basic-auth to work
+  class: "ambassador"
+
+keycloak:
+  builder:
+    lora_dipex_client_enabled: true
+    environment:
+      KEYCLOAK_SSL_REQUIRED_MO: none
+      KEYCLOAK_SSL_REQUIRED_LORA: none

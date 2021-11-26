@@ -1,0 +1,23 @@
+# SPDX-FileCopyrightText: Magenta ApS
+#
+# SPDX-License-Identifier: MPL-2.0
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: os2mo-init-config
+  {{- with .Values.annotations }}
+  annotations:
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+data:
+  config: |
+    root_organisation:
+      name: xyz
+      user_key: 702d97ea-4e03-11ec-8163-c70f41b96b32
+    facets:
+      org_unit_address_type:
+        PhoneUnit:
+          title: "CVR"
+          scope: "CVR"
+    it_systems: {}
