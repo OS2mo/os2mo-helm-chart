@@ -41,6 +41,13 @@ spec:
                   key: client_secret
             - name: LORA_AUTH_REALM
               value: "lora"
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "200m"
+            limits:
+              memory: "128Mi"
+              cpu: "400m"
           volumeMounts:
            - name: os2mo-init-config-volume
              mountPath: /config
