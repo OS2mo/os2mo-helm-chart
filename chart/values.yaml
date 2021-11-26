@@ -39,10 +39,12 @@ os2mo:
     max_workers: 1
 
   init:
+    enabled: false
     image:
       repository: magentaaps/os2mo-init
       tag: latest
       pullPolicy: Always
+    config: {}
 
 lora:
   replicaCount: 1

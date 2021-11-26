@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: Magenta ApS
 #
 # SPDX-License-Identifier: MPL-2.0
----
+{{- if .Values.os2mo.init.enabled }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -21,3 +21,4 @@ data:
           title: "CVR"
           scope: "CVR"
     it_systems: {}
+{{- end }}
