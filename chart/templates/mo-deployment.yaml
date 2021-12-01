@@ -54,8 +54,8 @@ spec:
               value: "8080"
             - name: KEYCLOAK_HOST
               value: "keycloak-service"
-            {{- $is_https := empty .Values.ingress.tls_secret }}
-            {{- $protocol := ternary "http" "https" $is_https }}
+            {{- $is_http := empty .Values.ingress.tls_secret }}
+            {{- $protocol := ternary "http" "https" $is_http }}
             - name: KEYCLOAK_AUTH_SERVER_URL
               value: "{{ $protocol }}://{{ .Values.ingress.hostname }}/auth/"
 
