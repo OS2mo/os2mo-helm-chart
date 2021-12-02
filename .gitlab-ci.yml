@@ -84,6 +84,16 @@ Generate Project:
     - helm template --kube-version 1.19.11 chart/
 
 
+deploy:
+  image: alpine/helm
+  needs: []
+  before_script:
+  - helm plugin install https://github.com/chartmuseum/helm-push.git
+  - helm repo add magenta-chartmuseum https://chartmuseum.magentahosted.dk/
+  script:
+  - helm cm-push chart magenta-chartmuseum
+
+
 pages:
   image: python:3.8
   stage: deploy
