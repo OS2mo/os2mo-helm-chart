@@ -59,12 +59,7 @@ spec:
           ports:
             - containerPort: 8080
           resources:
-            requests:
-              memory: "512Mi"
-              cpu: "100m"
-            limits:
-              memory: "1024Mi"
-              cpu: "250m"
+            {{- toYaml .Values.lora.resources | nindent 12 }}
       initContainers:
         - name: mox-init
           image: "{{ .Values.lora.init.image.repository }}:{{ .Values.lora.init.image.tag }}"
@@ -120,10 +115,5 @@ spec:
                   name: mo-secret
                   key: db_password
           resources:
-            requests:
-              memory: "64Mi"
-              cpu: "100m"
-            limits:
-              memory: "128Mi"
-              cpu: "250m"
+            {{- toYaml .Values.initContainers.resources | nindent 12 }}
       restartPolicy: Always

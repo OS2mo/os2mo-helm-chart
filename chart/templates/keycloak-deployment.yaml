@@ -101,12 +101,7 @@ spec:
             failureThreshold: 60
             periodSeconds: 5
           resources:
-            requests:
-              memory: "1024Mi"
-              cpu: "500m"
-            limits:
-              memory: "2048Mi"
-              cpu: "1000m"
+            {{- toYaml .Values.keycloak.resources | nindent 12 }}
       initContainers:
         - name: keycloak-init
           image: "{{ .Values.keycloak.init.image.repository }}:{{ .Values.keycloak.init.image.tag }}"
@@ -145,12 +140,7 @@ spec:
                   name: keycloak-secret
                   key: db_password
           resources:
-            requests:
-              memory: "64Mi"
-              cpu: "500m"
-            limits:
-              memory: "128Mi"
-              cpu: "1000m"
+            {{- toYaml .Values.initContainers.resources | nindent 12 }}
         - name: keycloak-gen
           image: "{{ .Values.keycloak.builder.image.repository }}:{{ .Values.keycloak.builder.image.tag }}"
           imagePullPolicy: {{ .Values.keycloak.builder.image.pullPolicy }}
@@ -190,12 +180,7 @@ spec:
             {{- end }}
             {{- end }}
           resources:
-            requests:
-              memory: "64Mi"
-              cpu: "500m"
-            limits:
-              memory: "128Mi"
-              cpu: "1000m"
+            {{- toYaml .Values.initContainers.resources | nindent 12 }}
           volumeMounts:
             - name: keycloak-realm-json
               mountPath: /keycloak-realm-json

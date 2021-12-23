@@ -66,24 +66,14 @@ spec:
           ports:
             - containerPort: 5000
           resources:
-            requests:
-              memory: "512Mi"
-              cpu: "100m"
-            limits:
-              memory: "1536Mi"
-              cpu: "250m"
+            {{- toYaml .Values.os2mo.resources | nindent 12 }}
       initContainers:
         - name: wait-for-mox
           image: curlimages/curl
           command: ["/bin/sh","-c"]
           args: ['echo -e "Waiting for MOX to be ready\c"; while [ $(curl -ksw "%{http_code}" "http://mox-service:8080/site-map" -o /dev/null) -ne 200 ]; do sleep 1; echo -e ".\c"; done; echo "OK"']
           resources:
-            requests:
-              memory: "64Mi"
-              cpu: "5m"
-            limits:
-              memory: "128Mi"
-              cpu: "10m"
+            {{- toYaml .Values.initContainers.resources | nindent 12 }}
 {{ if .Values.load_fixture }}
         - name: fixture-loader
           image: magentaaps/os2mo-kolding-fixture:latest
@@ -105,11 +95,6 @@ spec:
                   name: mox-secret
                   key: db_password
           resources:
-            requests:
-              memory: "64Mi"
-              cpu: "100m"
-            limits:
-              memory: "128Mi"
-              cpu: "250m"
+            {{- toYaml .Values.initContainers.resources | nindent 12 }}
 {{ end }}
       restartPolicy: Always

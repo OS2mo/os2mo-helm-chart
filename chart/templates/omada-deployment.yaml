@@ -58,34 +58,19 @@ spec:
           command: ["/bin/sh","-c"]
           args: ['echo -e "Waiting for MOX to be ready\c"; while [ $(curl -ksw "%{http_code}" "http://mox-service:8080/site-map" -o /dev/null) -ne 200 ]; do sleep 1; echo -e ".\c"; done; echo "OK"']
           resources:
-            requests:
-              memory: "64Mi"
-              cpu: "5m"
-            limits:
-              memory: "128Mi"
-              cpu: "10m"
+            {{- toYaml .Values.initContainers.resources | nindent 12 }}
         - name: wait-for-mo
           image: curlimages/curl
           command: ["/bin/sh","-c"]
           args: ['echo -e "Waiting for MO to be ready\c"; while [ $(curl -ksw "%{http_code}" "http://mo-service:5000/" -o /dev/null) -ne 200 ]; do sleep 1; echo -e ".\c"; done; echo "OK"']
           resources:
-            requests:
-              memory: "64Mi"
-              cpu: "5m"
-            limits:
-              memory: "128Mi"
-              cpu: "10m"
+            {{- toYaml .Values.initContainers.resources | nindent 12 }}
         - name: wait-for-keycloak
           image: curlimages/curl
           command: ["/bin/sh","-c"]
           args: ['echo -e "Waiting for Keycloak to be ready\c"; while [ $(curl -ksw "%{http_code}" "http://keycloak-service:8080/auth/" -o /dev/null) -ne 200 ]; do sleep 1; echo -e ".\c"; done; echo "OK"']
           resources:
-            requests:
-              memory: "64Mi"
-              cpu: "5m"
-            limits:
-              memory: "128Mi"
-              cpu: "10m"
+            {{- toYaml .Values.initContainers.resources | nindent 12 }}
         - name: os2mo-init
           image: "{{ .Values.os2mo.init.image.repository }}:{{ .Values.os2mo.init.image.tag }}"
           imagePullPolicy: {{ .Values.os2mo.init.image.pullPolicy }}
@@ -109,12 +94,7 @@ spec:
             - name: LORA_AUTH_REALM
               value: "lora"
           resources:
-            requests:
-              memory: "64Mi"
-              cpu: "200m"
-            limits:
-              memory: "128Mi"
-              cpu: "400m"
+            {{- toYaml .Values.initContainers.resources | nindent 12 }}
           volumeMounts:
            - name: omada-init-config-volume
              mountPath: /config

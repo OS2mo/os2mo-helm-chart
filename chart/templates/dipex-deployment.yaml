@@ -48,12 +48,7 @@ spec:
               mountPath: "./opt/secrets"
               readOnly: true
           resources:
-            requests:
-              memory: "1000Mi"
-              cpu: "250m"
-            limits:
-              memory: "1500Mi"
-              cpu: "1000m"
+            {{- toYaml .Values.dipex.resources | nindent 12 }}
       volumes:
         - name: settingsfile
           configMap:

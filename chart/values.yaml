@@ -27,20 +27,15 @@ ingress:
 
 os2mo:
   replicaCount: 1
-
   image:
     repository: magentaaps/os2mo
     tag: latest
     pullPolicy: Always
-
   port: 80
-
   gunicorn:
     max_workers: 1
-
   graphql:
     enabled: false
-
   init:
     enabled: false
     image:
@@ -48,36 +43,44 @@ os2mo:
       tag: latest
       pullPolicy: Always
     config: {}
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "100m"
+    limits:
+      memory: "1536Mi"
+      cpu: "250m"
 
 lora:
   replicaCount: 1
-
   image:
     repository: magentaaps/lora
     tag: latest
     pullPolicy: Always
-
   gunicorn:
     max_workers: 1
-
   init:
     image:
       repository: magentaaps/postgres-os2mo
       tag: 12.7-11.7
       pullPolicy: Always
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "100m"
+    limits:
+      memory: "1024Mi"
+      cpu: "250m"
 
 dipex:
   image:
     repository: magentaaps/dipex
-    tag: dev
+    tag: latest
     pullPolicy: Always
-
   settings:
     mox.base: "http://mox-service:8080"
     mora.base: "http://mo-service:5000"
-
     crontab.RUN_IMPORTS_DUMMY: true
-
     crontab.SVC_USER: "USER@KOMMUNE.NET"
     crontab.SVC_KEYTAB: "/tmp/keytab-file"
     crontab.CRON_BACKUP: "/tmp/backup-dir"
@@ -86,21 +89,25 @@ dipex:
     crontab.BACKUP_SAVE_DAYS: "60"
     crontab.SNAPSHOT_LORA: "/tmp/db-snapshot.sql"
     crontab.OS2MO_COMPOSE_YML: "/tmp/to/os2mo/docker-compose.yml"
-
   secrets: {}
+  resources:
+    requests:
+      memory: "1000Mi"
+      cpu: "250m"
+    limits:
+      memory: "1500Mi"
+      cpu: "1000m"
 
 keycloak:
   image:
     repository: quay.io/keycloak/keycloak
     tag: 14.0.0
     pullPolicy: Always
-
   init:
     image:
       repository: magentaaps/postgres-keycloak-init
       tag: 12.7-11.7
       pullPolicy: Always
-
   builder:
     image:
       repository: magentaaps/os2mo-keycloak-realm-builder
@@ -108,11 +115,16 @@ keycloak:
       pullPolicy: Always
     lora_realm_enabled: false
     lora_dipex_client_enabled: false
-
     environment: {}
-
   startupProbe:
     initialDelaySeconds: 300
+  resources:
+    requests:
+      memory: "1024Mi"
+      cpu: "500m"
+    limits:
+      memory: "2048Mi"
+      cpu: "1000m"
 
 database:
   # Determine whether to deploy the database as a pod
@@ -127,6 +139,13 @@ database:
   password: null
   username_suffix: ""
   sslmode: ""
+  resources:
+    requests:
+      memory: "1024Mi"
+      cpu: "100m"
+    limits:
+      memory: "2048Mi"
+      cpu: "250m"
 
 omada:
   enabled: false
@@ -143,6 +162,15 @@ omada:
       cpu: "100m"
     limits:
       memory: "1024Mi"
+      cpu: "250m"
+
+initContainers:
+  resources:
+    requests:
+      memory: "64Mi"
+      cpu: "100m"
+    limits:
+      memory: "128Mi"
       cpu: "250m"
 
 nameOverride: ""
