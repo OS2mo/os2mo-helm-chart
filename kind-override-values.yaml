@@ -10,7 +10,7 @@ os2mo:
   gunicorn:
     max_workers: 2
   init:
-    enabled: true
+    enabled: false
     image:
       tag: latest
     config:
@@ -31,8 +31,22 @@ keycloak:
     environment:
       KEYCLOAK_SSL_REQUIRED_MO: none
       KEYCLOAK_SSL_REQUIRED_LORA: none
+      KEYCLOAK_REALM_USERS: '[
+        {
+          "username": "bruce",
+          "password": "bruce",
+          "firstname": "Bruce",
+          "lastname": "Lee",
+          "email": "bruce@kung.fu",
+          "roles": ["admin"],
+          "enabled": true
+        }
+      ]'
   startupProbe:
     initialDelaySeconds: 90
 
 omada:
   cronjob_schedule: "0/2 * * * *"
+
+load_fixture: true
+
