@@ -49,4 +49,3 @@ omada:
   cronjob_schedule: "0/2 * * * *"
 
 load_fixture: true
-
