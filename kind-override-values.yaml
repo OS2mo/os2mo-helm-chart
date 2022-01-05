@@ -3,12 +3,15 @@
 # SPDX-License-Identifier: MPL-2.0
 ---
 os2mo:
+  replicaCount: 1
   image:
-    tag: 3.4.8
+    repository: akring1729/os2mo
+    #tag: 3.4.8-debug
+    tag: 3.23.2-readiness
   graphql:
     enabled: true
   gunicorn:
-    max_workers: 2
+    max_workers: 1
   init:
     enabled: false
     image:
@@ -48,4 +51,4 @@ keycloak:
 omada:
   cronjob_schedule: "0/2 * * * *"
 
-load_fixture: true
+load_fixture: false

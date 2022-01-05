@@ -50,6 +50,8 @@ os2mo:
     limits:
       memory: "1536Mi"
       cpu: "250m"
+  probes:
+    initialDelaySeconds: 10
 
 lora:
   replicaCount: 1
@@ -71,6 +73,8 @@ lora:
     limits:
       memory: "1024Mi"
       cpu: "250m"
+  probes:
+    initialDelaySeconds: 10
 
 dipex:
   image:

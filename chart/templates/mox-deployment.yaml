@@ -60,6 +60,16 @@ spec:
             - containerPort: 8080
           resources:
             {{- toYaml .Values.lora.resources | nindent 12 }}
+          livenessProbe:
+            httpGet:
+              path: /version
+              port: 8080
+            initialDelaySeconds: {{ .Values.lora.probes.initialDelaySeconds }}
+          readinessProbe:
+            httpGet:
+              path: /version
+              port: 8080
+            initialDelaySeconds: {{ .Values.lora.probes.initialDelaySeconds }}
       initContainers:
         - name: mox-init
           image: "{{ .Values.lora.init.image.repository }}:{{ .Values.lora.init.image.tag }}"

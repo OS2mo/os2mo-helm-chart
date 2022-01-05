@@ -63,10 +63,23 @@ spec:
             - name: KEYCLOAK_AUTH_SERVER_URL
               value: "{{ $protocol }}://{{ .Values.ingress.hostname }}/auth/"
 
+            - name: OS2MO_AUTH
+              value: "false"
+
           ports:
             - containerPort: 5000
           resources:
             {{- toYaml .Values.os2mo.resources | nindent 12 }}
+          livenessProbe:
+            httpGet:
+              path: /health/ready
+              port: 5000
+            initialDelaySeconds: {{ .Values.os2mo.probes.initialDelaySeconds }}
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: 5000
+            initialDelaySeconds: {{ .Values.os2mo.probes.initialDelaySeconds }}
       initContainers:
         - name: wait-for-mox
           image: curlimages/curl
