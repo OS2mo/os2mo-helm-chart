@@ -52,7 +52,7 @@ os2mo:
   external_env_config_map_name: null
   environment: {}
   probes:
-    enabled: false
+    enabled: true
     startupProbe:
       failureThreshold: 150
       periodSeconds: 2
@@ -78,7 +78,7 @@ lora:
       memory: "1024Mi"
       cpu: "250m"
   probes:
-    enabled: false
+    enabled: true
     startupProbe:
       failureThreshold: 150
       periodSeconds: 2
