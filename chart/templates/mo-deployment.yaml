@@ -26,6 +26,12 @@ spec:
     spec:
       containers:
         - name: mo
+          {{- $versions := split "." .Values.os2mo.image.tag }}
+          {{- $major_version := int $versions._0 }}
+          {{- $minor_version := int $versions._1 }}
+          {{- if (lt $major_version 3) and (lt $minor_version 24) }}
+            {{- fail "MO version must be greater than 3.24.0" }}
+          {{- end }}
           image: "{{ .Values.os2mo.image.repository }}:{{ .Values.os2mo.image.tag }}"
           imagePullPolicy: {{ .Values.os2mo.image.pullPolicy }}
           env:
