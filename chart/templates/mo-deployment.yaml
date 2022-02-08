@@ -24,6 +24,10 @@ spec:
       labels:
         app: mo
     spec:
+      {{- if empty .Values.os2mo.image.pullSecret }}
+      imagePullSecrets:
+        - name: {{ .Values.os2mo.image.pullSecret }}
+      {{-end }}
       containers:
         - name: mo
           {{- if ne .Values.os2mo.image.tag "latest" }}
