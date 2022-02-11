@@ -24,13 +24,19 @@ spec:
       labels:
         app: keycloak
     spec:
+      {{- if and (ne .Values.keycloak.builder.image.tag "latest") (contains "." .Values.keycloak.builder.image.tag) }}
+      {{- if (semverCompare "<3.0.0" .Values.keycloak.builder.image.tag) }}
       volumes:
         - name: keycloak-realm-json
           emptyDir: {}
+      {{- end }}
+      {{- end }}
       containers:
         - name: keycloak
           image: "{{ .Values.keycloak.image.repository }}:{{ .Values.keycloak.image.tag }}"
           imagePullPolicy: {{ .Values.keycloak.image.pullPolicy }}
+          {{- if and (ne .Values.keycloak.builder.image.tag "latest") (contains "." .Values.keycloak.builder.image.tag) }}
+          {{- if (semverCompare "<3.0.0" .Values.keycloak.builder.image.tag) }}
           args: [
               "-b", "0.0.0.0",
               "-Dkeycloak.migration.action=import",
@@ -38,6 +44,8 @@ spec:
               "-Dkeycloak.migration.file=/keycloak-realm-json/keycloak-realm.json",
               "-Dkeycloak.migration.strategy=OVERWRITE_EXISTING"
           ]
+          {{- end }}
+          {{- end }}
           env:
             - name: KEYCLOAK_USER
               value: admin
@@ -73,10 +81,14 @@ spec:
             - name: JDBC_PARAMS
               value: "sslmode={{ .Values.database.sslmode }}"
             {{ end }}
+          {{- if and (ne .Values.keycloak.builder.image.tag "latest") (contains "." .Values.keycloak.builder.image.tag) }}
+          {{- if (semverCompare "<3.0.0" .Values.keycloak.builder.image.tag) }}
           volumeMounts:
             - name: keycloak-realm-json
               mountPath: /keycloak-realm-json
               readOnly: true
+          {{- end }}
+          {{- end }}
           # Liveness probe configuration
           livenessProbe:
             httpGet:
@@ -136,7 +148,9 @@ spec:
                   key: db_password
           resources:
             {{- toYaml .Values.initContainers.resources | nindent 12 }}
-        - name: keycloak-gen
+        {{- if and (ne .Values.keycloak.builder.image.tag "latest") (contains "." .Values.keycloak.builder.image.tag) }}
+        {{- if (semverCompare "<3.0.0" .Values.keycloak.builder.image.tag) }}
+        - name: keycloak-realm-builder
           image: "{{ .Values.keycloak.builder.image.repository }}:{{ .Values.keycloak.builder.image.tag }}"
           imagePullPolicy: {{ .Values.keycloak.builder.image.pullPolicy }}
           envFrom:
@@ -151,6 +165,8 @@ spec:
               value: "[\"{{ $protocol }}://{{ .Values.ingress.hostname }}\"]"
             - name: KEYCLOAK_DIPEX_CLIENT_ENABLED
               value: 'true'
+            - name: KEYCLOAK_IDP_NAME_ID_POLICY_FORMAT
+              value: "Unspecified"
             - name: KEYCLOAK_DIPEX_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
@@ -179,3 +195,5 @@ spec:
           volumeMounts:
             - name: keycloak-realm-json
               mountPath: /keycloak-realm-json
+        {{- end }}
+        {{- end }}

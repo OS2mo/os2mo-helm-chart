@@ -67,6 +67,16 @@ spec:
             {{- $protocol := ternary "http" "https" $is_http }}
             - name: KEYCLOAK_AUTH_SERVER_URL
               value: "{{ $protocol }}://{{ .Values.ingress.hostname }}/auth/"
+            - name: KEYCLOAK_MO_CLIENT
+            {{- if and (ne .Values.keycloak.builder.image.tag "latest") (contains "." .Values.keycloak.builder.image.tag) }}
+            {{- if (semverCompare "<3.0.0" .Values.keycloak.builder.image.tag) }}
+              value: "mo"
+            {{- else }}
+              value: "mo-frontend"
+            {{- end }}
+            {{- else }}
+              value: "mo-frontend"
+            {{- end }}
           envFrom:
 {{ if .Values.os2mo.external_env_config_map_name }}
           - configMapRef:
@@ -107,7 +117,65 @@ spec:
           args: ['echo -e "Waiting for Keycloak to be ready\c"; while [ $(curl -ksw "%{http_code}" "http://keycloak-service:8080/auth/realms/master" -o /dev/null) -ne 200 ]; do sleep 1; echo -e ".\c"; done; echo "OK"']
           resources:
             {{- toYaml .Values.initContainers.resources | nindent 12 }}
-{{ if .Values.load_fixture }}
+        {{- if and (ne .Values.keycloak.builder.image.tag "latest") (contains "." .Values.keycloak.builder.image.tag) }}
+        {{- if (semverCompare ">=3.0.0" .Values.keycloak.builder.image.tag) }}
+        - name: keycloak-realm-builder
+          image: "{{ .Values.keycloak.builder.image.repository }}:{{ .Values.keycloak.builder.image.tag }}"
+          imagePullPolicy: {{ .Values.keycloak.builder.image.pullPolicy }}
+          envFrom:
+            - configMapRef:
+                name: keycloak-gen-config
+          env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mox-secret
+                  key: db_password
+            {{- $use_ssl := (ne .Values.database.sslmode "") }}
+            {{- $sslmode := ternary "require" "disable" $use_ssl }}
+            - name: POSTGRES_CONNECTION_STRING
+              value: "postgres://{{ .Values.database.user }}:$(POSTGRES_PASSWORD)@{{ .Values.database.host }}/keycloak?sslmode={{ $sslmode }}"
+            - name: KEYCLOAK_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: keycloak-admin-secret
+                  key: admin_password
+            - name: KEYCLOAK_URL
+              value: "http://keycloak:8080"
+            - name: KEYCLOAK_MO_CLIENT_REDIRECT_URI
+              value: "[\"{{ $protocol }}://{{ .Values.ingress.hostname }}/*\"]"
+            - name: KEYCLOAK_MO_CLIENT_WEB_ORIGIN
+              value: "[\"{{ $protocol }}://{{ .Values.ingress.hostname }}\"]"
+            - name: KEYCLOAK_DIPEX_CLIENT_ENABLED
+              value: 'true'
+            - name: KEYCLOAK_DIPEX_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: keycloak-dipex-secret
+                  key: client_secret
+            - name: KEYCLOAK_LORA_REALM_ENABLED
+              value: "{{ .Values.keycloak.builder.lora_realm_enabled }}"
+            {{ - if .Values.keycloak.builder.lora_realm_enabled }}
+            - name: KEYCLOAK_LORA_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: keycloak-lora-client-secret
+                  key: client_secret
+            - name: KEYCLOAK_LORA_DIPEX_CLIENT_ENABLED
+              value: "{{ .Values.keycloak.builder.lora_dipex_client_enabled }}"
+            {{ - if .Values.keycloak.builder.lora_dipex_client_enabled }}
+            - name: KEYCLOAK_LORA_DIPEX_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: keycloak-lora-dipex-secret
+                  key: client_secret
+            {{ - end }}
+            {{ - end }}
+          resources:
+            {{ - toYaml .Values.initContainers.resources | nindent 12 }}
+        {{- end }}
+        {{- end }}
+  {{ if .Values.load_fixture }}
         - name: fixture-loader
           image: magentaaps/os2mo-kolding-fixture:latest
           imagePullPolicy: Always
