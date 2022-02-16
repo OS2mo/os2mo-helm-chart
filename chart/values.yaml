@@ -123,7 +123,7 @@ keycloak:
   builder:
     image:
       repository: magentaaps/os2mo-keycloak-realm-builder
-      tag: latest
+      tag: 2.4.1  # todo: fix by merging feature/48614-terraform-realm-builder
       pullPolicy: Always
     lora_realm_enabled: false
     lora_dipex_client_enabled: false
@@ -192,4 +192,4 @@ initContainers:
 nameOverride: ""
 fullnameOverride: ""
 
-load_fixture: false
+fixture: null

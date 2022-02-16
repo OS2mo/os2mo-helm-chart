@@ -138,9 +138,9 @@ Currently there are two ways of getting data into OS2mo:
 ### 5.1 Using the fixture loader
 **Goal**: Get data into OS2mo
 
-Using the fixture loader is simple, simply set `load_fixture: true` as a values override:
+Using the fixture loader is simple, simply set `fixture` to the desired fixture dataset as a values override:
 ```shell
-helm install chart/ --generate-name --set load_fixture=true
+helm install chart/ --generate-name --set-string fixture=kolding
 ```
 Or using an `values-override.yaml` file
 ```shell
@@ -148,7 +148,8 @@ helm install chart/ --generate-name -f values-override.yaml
 ```
 *Note: Use `helm upgrade` if a deployment has already been made.*
 
-The fixture loader will run, and load the "Kolding Fixture" into the OS2mo instance.
+The fixture loader will run, and load the `kolding` fixture into the OS2mo instance. For a list of available fixtures,
+see [OS2mo Fixture Loader](https://git.magenta.dk/rammearkitektur/os2mo-fixture-loader).
 
 ### 5.2 Using the data integrations
 **Goal**: Get data into OS2mo
@@ -180,27 +181,22 @@ At this point the various DIPEX integrations should be ready for use.
 
 #### Creating root organisation
 
-In order to actually use MO we need a root organisation.
-This must manually be created from within the dipex container.
-
-If not already inside the DIPEX container, drop inside it using:
-```shell
-kubectl exec -it dipex-deployment-ID_HERE -- /bin/bash
-```
-For details see the above section.
-
-To setup a root organisation and some default classes use:
-```shell
-python3 tools/default_mo_setup.py
-```
-
-Now you *should* be ready to use dipex commands, such as:
-```shell
-python3 integrations/SD_Lon/sd_changed_at.py --init
-```
-or equivalently:
-```shell
-bash tools/job-runner.sh imports_sd_changed_at
+In order to actually use MO we need a root organisation, as well as required facets and classes. These are initialised
+using [OS2mo Init](https://git.magenta.dk/rammearkitektur/os2mo-init), which can be configured like so:
+```yaml
+os2mo:
+  init:
+    enabled: true
+    config:
+      root_organisation:
+        name: xyz
+        user_key: 702d97ea-4e03-11ec-8163-c70f41b96b32
+      facets:
+        org_unit_address_type:
+          PhoneUnit:
+            title: "CVR"
+            scope: "CVR"
+      it_systems: {}
 ```
 
 ## 6. Testing the installation

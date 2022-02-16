@@ -24,7 +24,7 @@ $ helm install chart/ --generate-name
 
 Which should bring up an OS2mo stack.
 
-For a more detailed walkthrough checkout the ["Getting Started"](GettingStarted.md) section.
+For a more detailed walk-through checkout the ["Getting Started"](docs/GettingStarted.md) section.
 
 ## License
 

@@ -67,6 +67,8 @@ spec:
             {{- $protocol := ternary "http" "https" $is_http }}
             - name: KEYCLOAK_AUTH_SERVER_URL
               value: "{{ $protocol }}://{{ .Values.ingress.hostname }}/auth/"
+            - name: KEYCLOAK_MO_CLIENT  # todo: fix by merging feature/48614-terraform-realm-builder
+              value: "mo"
           envFrom:
 {{ if .Values.os2mo.external_env_config_map_name }}
           - configMapRef:
@@ -106,28 +108,5 @@ spec:
           command: ["/bin/sh","-c"]
           args: ['echo -e "Waiting for Keycloak to be ready\c"; while [ $(curl -ksw "%{http_code}" "http://keycloak-service:8080/auth/realms/master" -o /dev/null) -ne 200 ]; do sleep 1; echo -e ".\c"; done; echo "OK"']
           resources:
-            {{- toYaml .Values.initContainers.resources | nindent 12 }}
-{{ if .Values.load_fixture }}
-        - name: fixture-loader
-          image: magentaaps/os2mo-kolding-fixture:latest
-          imagePullPolicy: Always
-          env:
-            - name: POSTGRES_HOST
-              value: {{ .Values.database.host }}
-            {{ if ne .Values.database.sslmode "" }}
-            - name: POSTGRES_SSL
-              value: {{ .Values.database.sslmode }}
-            {{ end }}
-            - name: POSTGRES_NAME
-              value: "mox"
-            - name: POSTGRES_USER
-              value: "mox{{ .Values.database.username_suffix }}"
-            - name: POSTGRES_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: mox-secret
-                  key: db_password
-          resources:
-            {{- toYaml .Values.initContainers.resources | nindent 12 }}
-{{ end }}
+          {{- toYaml .Values.initContainers.resources | nindent 12 }}
       restartPolicy: Always

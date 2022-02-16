@@ -137,6 +137,33 @@ spec:
                   key: db_password
           resources:
             {{- toYaml .Values.initContainers.resources | nindent 12 }}
+        {{ if .Values.fixture }}
+        - name: fixture-loader
+          image: magentaaps/os2mo-fixture-loader:0.0.3
+          args: [ {{ .Values.fixture }} ]
+          env:
+            - name: PGHOST
+              value: {{ .Values.database.host }}
+            {{ if ne .Values.database.sslmode "" }}
+            - name: PGSSLMODE
+              value: {{ .Values.database.sslmode }}
+            {{ end }}
+            - name: PGDATABASE
+              value: "mox"
+            - name: PGUSER
+              value: "{{ .Values.database.user }}{{ .Values.database.username_suffix }}"
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  {{ if .Values.database.password_secret }}
+                  name: {{ .Values.database.password_secret }}
+                  {{ else }}
+                  name: mox-db-secret
+                  {{ end }}
+                  key: db_password
+          resources:
+            {{- toYaml .Values.initContainers.resources | nindent 12 }}
+        {{ end }}
         - name: wait-for-keycloak
           image: curlimages/curl
           command: ["/bin/sh","-c"]
