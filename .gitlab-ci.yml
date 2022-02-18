@@ -8,6 +8,7 @@
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
   PRE_COMMIT_HOME: "$CI_PROJECT_DIR/.cache/pre-commit"
+  HELM_REPO: https://chartmuseum.magentahosted.dk
 
 cache:
   key: "${CI_JOB_NAME}"
@@ -19,6 +20,7 @@ cache:
 stages:
   - lint
   - test
+  - review
   - release
   - deploy
 
@@ -68,14 +70,12 @@ include:
 Lint Project:
   <<: *lint
   script:
-    - ./tools/set_chart_version.sh
     - pre-commit run --all-files
 
 Lint Chart:
   stage: lint
   image: quay.io/helmpack/chart-testing:v3.4.0
   script:
-    - ./tools/set_chart_version.sh
     - ct lint --all --chart-dirs .
 
 
@@ -85,7 +85,6 @@ Lint Chart:
 Generate Project:
   <<: *test
   script:
-    - ./tools/set_chart_version.sh
     - helm template --kube-version 1.19.11 chart/
 
 
@@ -99,10 +98,9 @@ Release version:
     - docker
   before_script:
     - helm plugin install https://github.com/chartmuseum/helm-push.git
-    - helm repo add magenta-chartmuseum https://chartmuseum.magentahosted.dk/
+    - helm repo add magenta-chartmuseum $HELM_REPO
   script:
-    - ./tools/set_chart_version.sh
-    - helm cm-push chart magenta-chartmuseum
+    - helm cm-push --version=$CI_COMMIT_TAG chart magenta-chartmuseum
   rules:
     - if: $CI_COMMIT_TAG =~ /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/
 
@@ -121,6 +119,50 @@ pages:
       - public
   rules:
     - if: $CI_COMMIT_TAG =~ /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/
+
+# Review Stage
+##############
+deploy_review:
+  stage: review
+  needs: []
+  image:
+    name: alpine/helm:3.7.1
+    entrypoint: [""]
+  tags:
+    - docker
+  before_script:
+    - helm plugin install https://github.com/chartmuseum/helm-push.git
+    - helm repo add magenta-chartmuseum $HELM_REPO
+  script:
+    - helm cm-push --version=0.0.0-mr$CI_MERGE_REQUEST_IID --force chart magenta-chartmuseum
+  environment:
+    name: review/$CI_MERGE_REQUEST_IID
+    on_stop: stop_review
+    auto_stop_in: 1 week
+  rules:
+    - if: $CI_MERGE_REQUEST_ID
+      when: manual
+      allow_failure: true
+
+stop_review:
+  stage: review
+  needs: []
+  image: alpine:3
+  variables:
+    GIT_STRATEGY: none # We do not need the source code
+  tags:
+    - docker
+  before_script:
+    - apk add curl
+  script:
+    - curl -X DELETE -u $HELM_REPO_USERNAME:$HELM_REPO_PASSWORD $HELM_REPO/api/charts/os2mo/0.0.0-mr$CI_MERGE_REQUEST_IID
+  environment:
+    name: review/$CI_MERGE_REQUEST_IID
+    action: stop
+  rules:
+    - if: $CI_MERGE_REQUEST_ID
+      when: manual
+      allow_failure: true
 
 
 # Release stage
