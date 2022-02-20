@@ -10,7 +10,8 @@ variables:
   PRE_COMMIT_HOME: "$CI_PROJECT_DIR/.cache/pre-commit"
   HELM_REPO: https://chartmuseum.magentahosted.dk
   REVIEW_VERSION: 0.0.0-mr$CI_MERGE_REQUEST_IID
-  REVIEW_URL: $HELM_REPO/api/charts/os2mo/$REVIEW_VERSION
+  REVIEW_CHART_URL: $HELM_REPO/api/charts/os2mo/$REVIEW_VERSION
+  REVIEW_URL: https://mr$CI_MERGE_REQUEST_IID.moraci.magentahosted.dk
 
 cache:
   key: "${CI_JOB_NAME}"
@@ -124,7 +125,7 @@ pages:
 
 # Review Stage
 ##############
-deploy_review:
+deploy_helm_chart:
   stage: review
   needs: []
   image:
@@ -139,6 +140,115 @@ deploy_review:
     - helm cm-push --version=$REVIEW_VERSION --force chart magenta-chartmuseum
   environment:
     name: review/$CI_MERGE_REQUEST_IID
+    url: $REVIEW_CHART_URL
+    on_stop: stop_review
+    auto_stop_in: 1 week
+  rules:
+    - if: $CI_MERGE_REQUEST_ID
+      when: manual
+      allow_failure: true
+
+stop_helm_chart:
+  stage: review
+  needs: []
+  image: alpine:3
+  variables:
+    GIT_STRATEGY: none # We do not need the source code
+  tags:
+    - docker
+  before_script:
+    - apk add curl
+  script:
+    - curl -X DELETE -u $HELM_REPO_USERNAME:$HELM_REPO_PASSWORD $REVIEW_CHART_URL
+  environment:
+    name: review/$CI_MERGE_REQUEST_IID
+    action: stop
+  rules:
+    - if: $CI_MERGE_REQUEST_ID
+      when: manual
+      allow_failure: true
+
+deploy_helm_chart:
+  stage: review
+  needs: []
+  image:
+    name: alpine/helm:3.7.1
+    entrypoint: [""]
+  tags:
+    - docker
+  before_script:
+    - helm plugin install https://github.com/chartmuseum/helm-push.git
+    - helm repo add magenta-chartmuseum $HELM_REPO
+  script:
+    - helm cm-push --version=$REVIEW_VERSION --force chart magenta-chartmuseum
+  environment:
+    name: chart/$CI_MERGE_REQUEST_IID
+    url: $REVIEW_CHART_URL
+    on_stop: stop_helm_chart
+    auto_stop_in: 1 week
+  rules:
+    - if: $CI_MERGE_REQUEST_ID
+      when: manual
+      allow_failure: true
+
+stop_helm_chart:
+  stage: review
+  needs: []
+  image: alpine:3
+  variables:
+    GIT_STRATEGY: none # We do not need the source code
+  tags:
+    - docker
+  before_script:
+    - apk add curl
+  script:
+    - curl -X DELETE -u $HELM_REPO_USERNAME:$HELM_REPO_PASSWORD $REVIEW_CHART_URL
+  environment:
+    name: chart/$CI_MERGE_REQUEST_IID
+    action: stop
+  rules:
+    - if: $CI_MERGE_REQUEST_ID
+      when: manual
+      allow_failure: true
+
+deploy_review:
+  stage: review
+  needs: ["deploy_helm_chart"]
+  image: debian:bullseye
+  variables:
+    GIT_STRATEGY: none # We do not need the source code
+  tags:
+    - docker
+  before_script:
+    - apt-get update && apt-get install -y git j2cli curl
+  script:
+    - git config --global user.email "labs@magenta-aps.dk"
+    - git config --global user.name "OS2MO Config Updater"
+    - git clone https://$DEPLOY_USER:$ACCESS_TOKEN@git.magenta.dk/labs/salt-automation.git
+    - cd salt-automation/flux/clusters/os2mo-ci-magenta-az/
+    - |
+      extra_config="
+      ---
+      apiVersion: helm.toolkit.fluxcd.io/v2beta1
+      kind: HelmRelease
+      metadata:
+        name: os2mo
+      spec:
+        chart:
+          spec:
+            version: \"$REVIEW_CHART_VERSION\""
+    - ./template.sh $CI_MERGE_REQUEST_IID "$extra_config"
+    - git add kustomization.yaml os2mo-mr$CI_MERGE_REQUEST_IID
+    - git status
+    - git commit -m "[cd] Deploy OS2MO-Helm-Chart MR$CI_MERGE_REQUEST_IID to flux CI cluster" || true
+    - git push || true
+    - curl $REVIEW_URL/version/
+      --fail
+      --retry-all-errors
+      --retry-delay 5
+      --retry 120
+  environment:
+    name: review/$CI_MERGE_REQUEST_IID
     url: $REVIEW_URL
     on_stop: stop_review
     auto_stop_in: 1 week
@@ -150,15 +260,23 @@ deploy_review:
 stop_review:
   stage: review
   needs: []
-  image: alpine:3
+  image: debian:bullseye
   variables:
     GIT_STRATEGY: none # We do not need the source code
   tags:
     - docker
   before_script:
-    - apk add curl
+    - apt-get update && apt-get install -y git j2cli
   script:
-    - curl -X DELETE -u $HELM_REPO_USERNAME:$HELM_REPO_PASSWORD $REVIEW_URL
+    - git config --global user.email "labs@magenta-aps.dk"
+    - git config --global user.name "OS2MO Config Updater"
+    - git clone https://$DEPLOY_USER:$ACCESS_TOKEN@git.magenta.dk/labs/salt-automation.git
+    - cd salt-automation/flux/clusters/os2mo-ci-magenta-az/
+    - ./untemplate.sh $CI_MERGE_REQUEST_IID
+    - git add kustomization.yaml os2mo-mr$CI_MERGE_REQUEST_IID
+    - git status
+    - git commit -m "[cd] Undeploy OS2MO-Helm-Chart MR$CI_MERGE_REQUEST_IID from flux CI cluster" || true
+    - git push || true
   environment:
     name: review/$CI_MERGE_REQUEST_IID
     action: stop
