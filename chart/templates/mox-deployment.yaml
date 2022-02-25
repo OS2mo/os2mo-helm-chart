@@ -70,10 +70,16 @@ spec:
             httpGet:
               path: /kubernetes/live
               port: 8080
+            periodSeconds: {{ .Values.lora.probes.liveness.periodSeconds }}
+            timeoutSeconds: {{ .Values.lora.probes.liveness.timeoutSeconds }}
+            failureThreshold: {{ .Values.lora.probes.liveness.failureThreshold }}
           readinessProbe:
             httpGet:
               path: /kubernetes/ready
               port: 8080
+            periodSeconds: {{ .Values.lora.probes.readiness.periodSeconds }}
+            timeoutSeconds: {{ .Values.lora.probes.readiness.timeoutSeconds }}
+            failureThreshold: {{ .Values.lora.probes.readiness.failureThreshold }}
           startupProbe:
             httpGet:
               path: /kubernetes/ready

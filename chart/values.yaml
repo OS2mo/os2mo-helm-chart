@@ -57,6 +57,14 @@ os2mo:
     startupProbe:
       failureThreshold: 150
       periodSeconds: 2
+    liveness:
+      periodSeconds: 10
+      timeoutSeconds: 1
+      failureThreshold: 3
+    readiness:
+      periodSeconds: 10
+      timeoutSeconds: 1
+      failureThreshold: 3
 
 lora:
   replicaCount: 1
@@ -84,6 +92,14 @@ lora:
     startupProbe:
       failureThreshold: 150
       periodSeconds: 2
+    liveness:
+      periodSeconds: 10
+      timeoutSeconds: 1
+      failureThreshold: 3
+    readiness:
+      periodSeconds: 10
+      timeoutSeconds: 1
+      failureThreshold: 3
 
 dipex:
   image:
