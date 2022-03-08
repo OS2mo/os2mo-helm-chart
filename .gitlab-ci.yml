@@ -184,8 +184,10 @@ deploy_review:
   script:
     - git config --global user.email "labs@magenta-aps.dk"
     - git config --global user.name "OS2MO Config Updater"
-    - git clone https://$DEPLOY_USER:$ACCESS_TOKEN@git.magenta.dk/labs/salt-automation.git
+    - git clone https://vk:glpat-gSrVybnrwEa11xyHa_NB@git.magenta.dk/labs/salt-automation.git
     - cd salt-automation/flux/clusters/os2mo-ci-magenta-az/
+    - git branch caspervk-tmp-test || true
+    - git checkout caspervk-tmp-test
     - |
       extra_config="
       ---
@@ -230,8 +232,10 @@ stop_review:
   script:
     - git config --global user.email "labs@magenta-aps.dk"
     - git config --global user.name "OS2MO Config Updater"
-    - git clone https://$DEPLOY_USER:$ACCESS_TOKEN@git.magenta.dk/labs/salt-automation.git
+    - git clone https://vk:glpat-gSrVybnrwEa11xyHa_NB@git.magenta.dk/labs/salt-automation.git
     - cd salt-automation/flux/clusters/os2mo-ci-magenta-az/
+    - git branch caspervk-tmp-test || true
+    - git checkout caspervk-tmp-test
     - ./untemplate.sh chart-mr$CI_MERGE_REQUEST_IID
     - git add kustomization.yaml chart-mr$CI_MERGE_REQUEST_IID
     - git status

@@ -48,7 +48,11 @@ spec:
             - name: KEYCLOAK_PASSWORD
               valueFrom:
                 secretKeyRef:
+                  {{ if .Values.keycloak.admin_secret }}
+                  name: {{ .Values.keycloak.admin_secret }}
+                  {{ else }}
                   name: keycloak-admin-secret
+                  {{ end }}
                   key: admin_password
 
             {{- $is_https := empty .Values.ingress.tls_secret }}
