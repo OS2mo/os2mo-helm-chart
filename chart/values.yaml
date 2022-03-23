@@ -200,6 +200,22 @@ omada:
       memory: "1024Mi"
       cpu: "250m"
 
+sdtool:
+  enabled: false
+  image:
+    repository: magentaaps/os2mo-http-trigger-sdtool
+    tag: latest
+    pullPolicy: Always
+  sd_base_url: https://service.sd.dk/sdws/
+  sd_too_deep: "[]"
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "500m"
+    limits:
+      memory: "1024Mi"
+      cpu: "1500m"
+
 initContainers:
   resources:
     requests:

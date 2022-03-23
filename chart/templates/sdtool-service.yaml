@@ -1,0 +1,23 @@
+# SPDX-FileCopyrightText: Magenta ApS
+#
+# SPDX-License-Identifier: MPL-2.0
+---
+{{- if .Values.sdtool.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: sdtool
+  labels:
+    app: sdtool
+  {{- with .Values.annotations }}
+  annotations:
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  selector:
+    app: sdtool
+  ports:
+    - name: "5000"
+      port: 5000
+      targetPort: 5080
+{{- end }}

@@ -1,0 +1,85 @@
+# SPDX-FileCopyrightText: Magenta ApS
+#
+# SPDX-License-Identifier: MPL-2.0
+---
+{{- if .Values.sdtool.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sdtool
+  labels:
+    app: sdtool
+  {{- with .Values.annotations }}
+  annotations:
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  selector:
+    matchLabels:
+      app: sdtool
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: sdtool
+    spec:
+      containers:
+        - name: sdtool
+          image: "{{ .Values.sdtool.image.repository }}:{{ .Values.sdtool.image.tag }}"
+          imagePullPolicy: {{ .Values.sdtool.image.pullPolicy }}
+          env:
+            - name: MORA_URL
+              value: "http://mo-service:5000"
+            - name: AUTH_SERVER
+              value: "http://keycloak-service:8080/auth"
+            - name: AUTH_REALM
+              value: "mo"
+            - name: CLIENT_ID
+              value: "dipex"
+            - name: CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: keycloak-dipex-secret
+                  key: client_secret
+            - name: SD_BASE_URL
+              value: {{ .Values.sdtool.sd_base_url | quote }}
+
+            # The three ENVs below require an sd-secret created in Flux
+
+            - name: SD_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: sd-secret
+                  key: sd_username
+            - name: SD_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: sd-secret
+                  key: sd_password
+            - name: SD_INSTITUTION
+              valueFrom:
+                secretKeyRef:
+                  name: sd-secret
+                  key: sd_institution
+
+            - name: SD_TOO_DEEP
+              value: {{ .Values.sdtool.sd_tool_deep | quote }}
+          ports:
+            - containerPort: 5000
+          resources:
+            {{- toYaml .Values.sdtool.resources | nindent 12 }}
+      initContainers:
+        - name: wait-for-keycloak
+          image: curlimages/curl
+          command: ["/bin/sh","-c"]
+          args: ['while [ $(curl -ksw "%{http_code}" "http://keycloak-service:8080/auth/realms/master" -o /dev/null) -ne 200 ]; do sleep 1; echo "Waiting for Keycloak to be ready"; done; echo "OK"']
+          resources:
+            {{- toYaml .Values.initContainers.resources | nindent 12 }}
+        - name: wait-for-mo
+          image: curlimages/curl
+          command: ["/bin/sh","-c"]
+          args: ['while [ $(curl -ksw "%{http_code}" "http://mo-service:5000/" -o /dev/null) -ne 200 ]; do sleep 1; echo "Waiting for MO to be ready"; done; echo "OK"']
+          resources:
+            {{- toYaml .Values.initContainers.resources | nindent 12 }}
+{{- end }}
