@@ -74,10 +74,4 @@ spec:
           args: ['while [ $(curl -ksw "%{http_code}" "http://keycloak-service:8080/auth/realms/master" -o /dev/null) -ne 200 ]; do sleep 1; echo "Waiting for Keycloak to be ready"; done; echo "OK"']
           resources:
             {{- toYaml .Values.initContainers.resources | nindent 12 }}
-        - name: wait-for-mo
-          image: curlimages/curl
-          command: ["/bin/sh","-c"]
-          args: ['while [ $(curl -ksw "%{http_code}" "http://mo-service:5000/" -o /dev/null) -ne 200 ]; do sleep 1; echo "Waiting for MO to be ready"; done; echo "OK"']
-          resources:
-            {{- toYaml .Values.initContainers.resources | nindent 12 }}
 {{- end }}

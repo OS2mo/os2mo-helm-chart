@@ -80,6 +80,9 @@ spec:
 {{ end }}
           - configMapRef:
               name: mo-config
+          - configMapRef:
+              name: mo-json-config
+
           ports:
             - containerPort: 5000
           resources:
@@ -117,6 +120,12 @@ spec:
           image: curlimages/curl
           command: ["/bin/sh","-c"]
           args: ['while [ $(curl -ksw "%{http_code}" "http://keycloak-service:8080/auth/realms/master" -o /dev/null) -ne 200 ]; do sleep 1; echo "Waiting for Keycloak to be ready"; done; echo "OK"']
+          resources:
+            {{- toYaml .Values.initContainers.resources | nindent 12 }}
+        - name: wait-for-sdtool
+          image: curlimages/curl
+          command: ["/bin/sh","-c"]
+          args: ['while [ $(curl -ksw "%{http_code}" "http://sdtool-service/triggers" -o /dev/null) -ne 200 ]; do sleep 1; echo "Waiting for SDTool to be ready"; done; echo "OK"']
           resources:
             {{- toYaml .Values.initContainers.resources | nindent 12 }}
       restartPolicy: Always

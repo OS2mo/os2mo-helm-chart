@@ -24,6 +24,10 @@ os2mo:
   environment:
     GRAPHQL_ENABLE: true
     KEYCLOAK_VERIFY_AUDIENCE: false
+    FETCH_TRIGGER_TIMEOUT: 60
+    RUN_TRIGGER_TIMEOUT: 60
+  environment_containing_json:
+    HTTP_ENDPOINTS: '["http://sdtool-service"]'
   resources:
     requests:
       memory: "1024Mi"
@@ -64,5 +68,8 @@ keycloak:
 
 omada:
   cronjob_schedule: "0/2 * * * *"
+
+sdtool:
+  enabled: false
 
 fixture: "kolding"

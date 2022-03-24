@@ -52,6 +52,7 @@ os2mo:
       cpu: "1000m"
   external_env_config_map_name: null
   environment: {}
+  environment_containing_json: {}
   probes:
     enabled: true
     startupProbe:
