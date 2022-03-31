@@ -23,6 +23,7 @@ os2mo:
     log_level: DEBUG
   environment:
     GRAPHQL_ENABLE: true
+    ENABLE_CORS: true
     KEYCLOAK_VERIFY_AUDIENCE: false
     FETCH_TRIGGER_TIMEOUT: 60
     RUN_TRIGGER_TIMEOUT: 60
@@ -73,3 +74,18 @@ sdtool:
   enabled: false
 
 fixture: "kolding"
+
+orgviewer:
+  med:
+    enabled: true
+    hostname: orgviewer-med.example.com
+    url: http://orgviewer-med.example.com
+    org_uuid: "f06ee470-9f17-566f-acbe-e938112d46d9"
+    title: "Medarbejder organisation"
+
+  adm:
+    enabled: true
+    hostname: orgviewer-adm.example.com
+    url: http://orgviewer-adm.example.com
+    org_uuid: "fb2d158f-114e-5f67-8365-2c520cf10b58"
+    title: "Administrativ organisation"

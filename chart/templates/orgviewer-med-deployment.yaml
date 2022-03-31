@@ -1,0 +1,57 @@
+# SPDX-FileCopyrightText: Magenta ApS
+#
+# SPDX-License-Identifier: MPL-2.0
+---
+{{- if .Values.orgviewer.med.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: orgviewer-med-deployment
+  labels:
+    app: orgviewer-med
+spec:
+  selector:
+    matchLabels:
+      app: orgviewer-med
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: orgviewer-med
+    spec:
+      containers:
+        - name: orgviewer-med
+          image: "{{ .Values.orgviewer.image.repository }}:{{ .Values.orgviewer.image.tag }}"
+          imagePullPolicy: {{ .Values.orgviewer.image.pullPolicy }}
+          env:
+            - name: GLOBAL_API_URL
+              value: {{ .Values.orgviewer.med.url }}
+
+            - name: GLOBAL_APP_TITLE
+              value: {{ .Values.orgviewer.med.title }}
+
+            - name: GLOBAL_API_ROOT_UUID
+              value: {{ .Values.orgviewer.med.org_uuid }}
+
+            - name: SAML_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: keycloak-dipex-secret
+                  key: client_secret
+
+            - name: PROXY_PASS_TO
+              value: "http://mo-service:5000"
+
+            - name: GLOBAL_ORG_PERSON_RELATION
+              value: "association"
+
+            - name: CUSTOMER
+              value: "default"
+
+            - name: VUE_APP_TREE_LAYOUT
+              value: "vertical"
+          ports:
+            - containerPort: 80
+      restartPolicy: Always
+{{- end }}

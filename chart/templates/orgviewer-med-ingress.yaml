@@ -1,0 +1,22 @@
+# SPDX-FileCopyrightText: Magenta ApS
+#
+# SPDX-License-Identifier: MPL-2.0
+---
+{{- if .Values.orgviewer.med.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: orgviewer-med-ingress
+spec:
+  rules:
+    - host: {{ .Values.orgviewer.med.hostname }}
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: orgviewer-med-service
+                port:
+                  number: 80
+{{- end }}

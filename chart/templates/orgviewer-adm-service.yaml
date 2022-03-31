@@ -1,0 +1,17 @@
+# SPDX-FileCopyrightText: Magenta ApS
+#
+# SPDX-License-Identifier: MPL-2.0
+---
+{{- if .Values.orgviewer.adm.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: orgviewer-adm-service
+spec:
+  selector:
+    app: orgviewer-adm
+  ports:
+    - name: "80"
+      port: 80
+      targetPort: 80
+{{- end }}
