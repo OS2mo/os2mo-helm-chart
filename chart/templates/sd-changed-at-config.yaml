@@ -1,0 +1,14 @@
+# SPDX-FileCopyrightText: Magenta ApS
+#
+# SPDX-License-Identifier: MPL-2.0
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sd-changed-at
+  {{- with .Values.annotations }}
+  annotations:
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+data:
+{{ toYaml .Values.sd_changed_at.environment | indent 2 }}

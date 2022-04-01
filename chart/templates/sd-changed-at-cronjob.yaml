@@ -1,0 +1,48 @@
+# SPDX-FileCopyrightText: Magenta ApS
+#
+# SPDX-License-Identifier: MPL-2.0
+---
+{{- if .Values.sd_changed_at.enabled }}
+# v1beta1 necessary for Kubernetes versions < 1.21
+apiVersion: {{ ternary "batch/v1beta1" "batch/v1" (.Capabilities.APIVersions.Has "batch/v1beta1/CronJob") }}
+kind: CronJob
+metadata:
+  name: sd_changed_at
+  labels:
+    app: sd_changed_at
+  {{- with .Values.annotations }}
+  annotations:
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  schedule: {{ .Values._sd_changed_at.cronjob_schedule }}
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: sd_changed_at
+              image: curlimages/curl
+              command: ["/bin/sh","-c"]
+              args: [ 'curl -X POST "http://sd-changed-at-service:5000/trigger"' ]
+              resources:
+                requests:
+                  memory: "64Mi"
+                  cpu: "5m"
+                limits:
+                  memory: "128Mi"
+                  cpu: "10m"
+          initContainers:
+            - name: wait-for-sd-changed-at
+              image: curlimages/curl
+              command: ["/bin/sh","-c"]
+              args: ['while [ $(curl -ksw "%{http_code}" "http://sd-changed-at-service:5000/" -o /dev/null) -ne 200 ]; do sleep 1; echo "Waiting for SD-changed-at to be ready"; done; echo "OK"']
+              resources:
+                requests:
+                  memory: "64Mi"
+                  cpu: "5m"
+                limits:
+                  memory: "128Mi"
+                  cpu: "10m"
+          restartPolicy: OnFailure
+{{- end }}

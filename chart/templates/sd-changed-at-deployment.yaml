@@ -1,0 +1,91 @@
+# SPDX-FileCopyrightText: Magenta ApS
+#
+# SPDX-License-Identifier: MPL-2.0
+---
+{{- if .Values.sd_changed_at.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sd-changed-at
+  labels:
+    app: sd-changed-at
+  {{- with .Values.annotations }}
+  annotations:
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  selector:
+    matchLabels:
+      app: sd-changed-at
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: sd-changed-at
+    spec:
+      containers:
+        - name: sd-changed-at
+          image: "{{ .Values.sd_changed_at.image.repository }}:{{ .Values.sd_changed_at.image.tag }}"
+          imagePullPolicy: {{ .Values.sd_changed_at.image.pullPolicy }}
+          env:
+            - name: SD_GLOBAL_FROM_DATE
+              value: {{ .Values.sd_changed_at.sd_global_from_date }}
+            - name: SD_JOB_FUNCTION
+              value: {{ .Values.sd_changed_at.sd_job_function }}
+            - name: SD_MONTHLY_HOURLY_DIVIDE
+              value: {{ .Values.sd_changed_at.sd_monthly_hourly_divide }}
+            - name: SD_IMPORT_RUN_DB
+              value: {{ .Values.sd_changed_at.sd_import_run_db }}
+
+            # The three ENVs below require an sd-secret created in Flux
+
+            - name: SD_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.sd_changed_at.sd_secret_name }}
+                  key: sd_username
+            - name: SD_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.sd_changed_at.sd_secret_name }}
+                  key: sd_password
+            - name: SD_INSTITUTION
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.sd_changed_at.sd_secret_name }}
+                  key: sd_institution
+          envFrom:
+            - configMapRef:
+                name: sd-changed-at
+          ports:
+            - containerPort: 5000
+          resources:
+            {{- toYaml .Values.sd_changed_at.resources | nindent 12 }}
+          volumeMounts:
+            mountPath: "/mnt/dipex"
+            name: run-db-pv
+      initContainers:
+        - name: wait-for-keycloak
+          image: curlimages/curl
+          command: ["/bin/sh","-c"]
+          args: ['while [ $(curl -ksw "%{http_code}" "http://keycloak-service:8080/auth/realms/master" -o /dev/null) -ne 200 ]; do sleep 1; echo "Waiting for Keycloak to be ready"; done; echo "OK"']
+          resources:
+            {{- toYaml .Values.initContainers.resources | nindent 12 }}
+        - name: wait-for-mox
+          image: curlimages/curl
+          command: ["/bin/sh","-c"]
+          args: ['while [ $(curl -ksw "%{http_code}" "http://mox-service:8080/site-map" -o /dev/null) -ne 200 ]; do sleep 1; echo "Waiting for MOX to be ready"; done; echo "OK"']
+          resources:
+            {{- toYaml .Values.initContainers.resources | nindent 12 }}
+        - name: wait-for-mo
+          image: curlimages/curl
+          command: ["/bin/sh","-c"]
+          args: ['while [ $(curl -ksw "%{http_code}" "http://mo-service:5000/" -o /dev/null) -ne 200 ]; do sleep 1; echo "Waiting for MO to be ready"; done; echo "OK"']
+          resources:
+            {{- toYaml .Values.initContainers.resources | nindent 12 }}
+      volumes:
+        - name: run-db-pv
+          persistentVolumeClaim:
+            claimName: run-db-pvc
+{{- end }}

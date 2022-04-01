@@ -201,6 +201,28 @@ omada:
       memory: "1024Mi"
       cpu: "250m"
 
+sd_changed_at:
+  enabled: false
+  image:
+    repository: magentaaps/os2mo-sd-changed-at
+    tag: latest
+    pullPolicy: Always
+  mora_base: http://mo-service:5000
+  sd_secret_name: sd-secret
+  sd_global_from_date: "MUST BE OVERRIDDEN"
+  sd_job_function: "MUST BE OVERRIDDEN"
+  sd_monthly_hourly_divide: "MUST BE OVERRIDDEN"
+  sd_import_run_db: "MUST BE OVERRIDDEN"
+  environment: {}
+  cronjob_schedule: "0 6 * * *"
+  resources:
+    requests:
+      memory: "1536Mi"
+      cpu: "1000m"
+    limits:
+      memory: "2048Mi"
+      cpu: "2000m"
+
 sdtool:
   enabled: false
   image:
