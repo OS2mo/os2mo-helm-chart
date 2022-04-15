@@ -21,7 +21,7 @@ spec:
       template:
         spec:
           containers:
-            - name: sd_changed_at
+            - name: sd-changed-at
               image: curlimages/curl
               command: ["/bin/sh","-c"]
               args: [ 'curl -X POST "http://sd-changed-at-service:5000/trigger"' ]
