@@ -7,9 +7,9 @@
 apiVersion: {{ ternary "batch/v1beta1" "batch/v1" (.Capabilities.APIVersions.Has "batch/v1beta1/CronJob") }}
 kind: CronJob
 metadata:
-  name: sd_changed_at
+  name: sd-changed-at
   labels:
-    app: sd_changed_at
+    app: sd-changed-at
   {{- with .Values.annotations }}
   annotations:
   {{- toYaml . | nindent 4 }}
