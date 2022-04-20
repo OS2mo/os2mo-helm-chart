@@ -236,8 +236,7 @@ sdtool:
     tag: latest
     pullPolicy: Always
   sd_secret_name: sd-secret
-  sd_too_deep: []
-  environment_containing_json: {}
+  sd_too_deep: '[]'
   resources:
     requests:
       memory: "512Mi"
