@@ -62,7 +62,7 @@ spec:
                   key: sd_institution
 
             - name: SD_TOO_DEEP
-              value: {{ .Values.sdtool.sd_too_deep | qoute }}
+              value: {{ .Values.sdtool.sd_too_deep | quote }}
           envFrom:
             - configMapRef:
                 name: sdtool-json-config
