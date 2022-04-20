@@ -62,7 +62,7 @@ spec:
                   key: sd_institution
 
             - name: SD_TOO_DEEP
-              value: {{ .Values.sdtool.sd_too_deep }}
+              value: "{{ .Values.sdtool.sd_too_deep }}"
           ports:
             - containerPort: 80
           resources:
