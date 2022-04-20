@@ -193,7 +193,7 @@ omada:
   host_header: null
   ntlm:
     enabled: false
-  cronjob_schedule: "*/5 6-17 * * *"
+  cronjob_schedule: "0 6 * * *"
   resources:
     requests:
       memory: "512Mi"
@@ -220,7 +220,7 @@ sd_changed_at:
   sd_monthly_hourly_divide: null
   sd_import_run_db: null
   environment: {}
-  cronjob_schedule: "0 6 * * *"
+  cronjob_schedule: "*/5 6-17 * * *"
   resources:
     requests:
       memory: "1536Mi"

@@ -15,7 +15,7 @@ metadata:
   {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  schedule: {{ .Values.sd_changed_at.cronjob_schedule }}
+  schedule: "{{ .Values.sd_changed_at.cronjob_schedule }}"
   jobTemplate:
     spec:
       template:

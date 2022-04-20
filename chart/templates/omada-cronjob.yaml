@@ -15,7 +15,7 @@ metadata:
   {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  schedule: {{ .Values.omada.cronjob_schedule }}
+  schedule: "{{ .Values.omada.cronjob_schedule }}"
   jobTemplate:
     spec:
       template:
