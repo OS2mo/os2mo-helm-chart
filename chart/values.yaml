@@ -237,6 +237,7 @@ sdtool:
     pullPolicy: Always
   sd_secret_name: sd-secret
   sd_too_deep: []
+  environment_containing_json: {}
   resources:
     requests:
       memory: "512Mi"

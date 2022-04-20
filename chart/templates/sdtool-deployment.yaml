@@ -61,8 +61,11 @@ spec:
                   name: {{ .Values.sdtool.sd_secret_name }}
                   key: sd_institution
 
-            - name: SD_TOO_DEEP
-              value: "{{ .Values.sdtool.sd_too_deep }}"
+#            - name: SD_TOO_DEEP
+#              value: "{{ .Values.sdtool.sd_too_deep }}"
+          envFrom:
+            - configMapRef:
+                name: sdtool-json-config
           ports:
             - containerPort: 80
           resources:
