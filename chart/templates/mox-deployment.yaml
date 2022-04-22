@@ -185,8 +185,8 @@ spec:
             {{- toYaml .Values.initContainers.resources | nindent 12 }}
 
         {{- if ne .Values.keycloak.builder.image.tag "latest" }}
-            {{- if (semverCompare "<3.0.0" .Values.keycloak.builder.image.tag) }}
-              {{- fail "Realm builder version must be at least 3.0.0 when probes are enabled" }}
+            {{- if (semverCompare "<3.8.0" .Values.keycloak.builder.image.tag) }}
+              {{- fail "Realm builder version must be at least 3.8.0" }}
             {{- end }}
           {{- end }}
         - name: keycloak-realm-builder
@@ -205,56 +205,57 @@ spec:
             {{- $sslmode := ternary "require" "disable" $use_ssl }}
             - name: POSTGRES_CONNECTION_STRING
               value: "postgres://keycloak:$(KEYCLOAK_DB_PASSWORD)@{{ .Values.database.host }}/keycloak?sslmode={{ $sslmode }}"
-            - name: KEYCLOAK_ADMIN_USERNAME
+
+            - name: TF_VAR_KEYCLOAK_ADMIN_USERNAME
               value: "admin"
-            - name: KEYCLOAK_ADMIN_PASSWORD
+            - name: TF_VAR_KEYCLOAK_ADMIN_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: keycloak-admin-secret
                   key: admin_password
-            - name: KEYCLOAK_URL
+            - name: TF_VAR_KEYCLOAK_URL
               value: "http://keycloak-service:8080"
             {{- $is_https := empty .Values.ingress.tls_secret }}
             {{- $protocol := ternary "http" "https" $is_https }}
-            - name: KEYCLOAK_MO_CLIENT_REDIRECT_URI
+            - name: TF_VAR_KEYCLOAK_MO_CLIENT_REDIRECT_URI
               value: "[\"{{ $protocol }}://{{ .Values.ingress.hostname }}/*\"]"
-            - name: KEYCLOAK_MO_CLIENT_WEB_ORIGIN
+            - name: TF_VAR_KEYCLOAK_MO_CLIENT_WEB_ORIGIN
               value: "[\"{{ $protocol }}://{{ .Values.ingress.hostname }}\"]"
-            - name: KEYCLOAK_DIPEX_CLIENT_ENABLED
+            - name: TF_VAR_KEYCLOAK_DIPEX_CLIENT_ENABLED
               value: 'true'
-            - name: KEYCLOAK_DIPEX_CLIENT_SECRET
+            - name: TF_VAR_KEYCLOAK_DIPEX_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
                   name: keycloak-dipex-secret
                   key: client_secret
-            - name: KEYCLOAK_ORGVIEWER_CLIENT_ENABLED
+            - name: TF_VAR_KEYCLOAK_ORGVIEWER_CLIENT_ENABLED
               value: "{{ .Values.keycloak.builder.orgviewer_client_enabled }}"
             {{- if .Values.keycloak.builder.orgviewer_client_enabled }}
-            - name: KEYCLOAK_ORGVIEWER_CLIENT_SECRET
+            - name: TF_VAR_KEYCLOAK_ORGVIEWER_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
                   name: keycloak-orgviewer-client-secret
                   key: client_secret
             {{- end }}
-            - name: KEYCLOAK_LORA_REALM_ENABLED
+            - name: TF_VAR_KEYCLOAK_LORA_REALM_ENABLED
               value: "{{ .Values.keycloak.builder.lora_realm_enabled }}"
             {{- if .Values.keycloak.builder.lora_realm_enabled }}
-            - name: KEYCLOAK_LORA_CLIENT_SECRET
+            - name: TF_VAR_KEYCLOAK_LORA_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
                   name: keycloak-lora-client-secret
                   key: client_secret
-            - name: KEYCLOAK_LORA_DIPEX_CLIENT_ENABLED
+            - name: TF_VAR_KEYCLOAK_LORA_DIPEX_CLIENT_ENABLED
               value: "{{ .Values.keycloak.builder.lora_dipex_client_enabled }}"
             {{- if .Values.keycloak.builder.lora_dipex_client_enabled }}
-            - name: KEYCLOAK_LORA_DIPEX_CLIENT_SECRET
+            - name: TF_VAR_KEYCLOAK_LORA_DIPEX_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
                   name: keycloak-lora-dipex-secret
                   key: client_secret
             {{- end }}
             {{- end }}
-            - name: KEYCLOAK_IDP_NAME_ID_POLICY_FORMAT
+            - name: TF_VAR_KEYCLOAK_IDP_NAME_ID_POLICY_FORMAT
               value: "Unspecified"
           resources:
             {{- toYaml .Values.initContainers.resources | nindent 12 }}
