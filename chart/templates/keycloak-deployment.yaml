@@ -24,36 +24,22 @@ spec:
       labels:
         app: keycloak
     spec:
-      {{- if not (include "useTerraformRealmBuilder" .) }}
-      volumes:
-        - name: keycloak-realm-json
-          emptyDir: {}
-      {{- end }}
       containers:
         - name: keycloak
           image: "{{ .Values.keycloak.image.repository }}:{{ .Values.keycloak.image.tag }}"
           imagePullPolicy: {{ .Values.keycloak.image.pullPolicy }}
-          {{- if not (include "useTerraformRealmBuilder" .) }}
-          args: [
-              "-b", "0.0.0.0",
-              "-Dkeycloak.migration.action=import",
-              "-Dkeycloak.migration.provider=singleFile",
-              "-Dkeycloak.migration.file=/keycloak-realm-json/keycloak-realm.json",
-              "-Dkeycloak.migration.strategy=OVERWRITE_EXISTING"
-          ]
-          {{- end }}
           env:
             - name: KEYCLOAK_USER
               value: admin
             - name: KEYCLOAK_PASSWORD
               valueFrom:
                 secretKeyRef:
+                  key: admin_password
                   {{ if .Values.keycloak.admin_secret }}
                   name: {{ .Values.keycloak.admin_secret }}
                   {{ else }}
                   name: keycloak-admin-secret
                   {{ end }}
-                  key: admin_password
 
             {{- $is_https := empty .Values.ingress.tls_secret }}
             {{- $protocol := ternary "http" "https" $is_https }}
@@ -81,12 +67,6 @@ spec:
             - name: JDBC_PARAMS
               value: "sslmode={{ .Values.database.sslmode }}"
             {{ end }}
-          {{- if not (include "useTerraformRealmBuilder" .) }}
-          volumeMounts:
-            - name: keycloak-realm-json
-              mountPath: /keycloak-realm-json
-              readOnly: true
-          {{- end }}
           # Liveness probe configuration
           livenessProbe:
             httpGet:
@@ -146,48 +126,3 @@ spec:
                   key: db_password
           resources:
             {{- toYaml .Values.initContainers.resources | nindent 12 }}
-        {{- if not (include "useTerraformRealmBuilder" .) }}
-        - name: keycloak-realm-builder
-          image: "{{ .Values.keycloak.builder.image.repository }}:{{ .Values.keycloak.builder.image.tag }}"
-          imagePullPolicy: {{ .Values.keycloak.builder.image.pullPolicy }}
-          envFrom:
-            - configMapRef:
-                name: keycloak-gen-config
-          env:
-            - name: KEYCLOAK_REALM_JSON_PATH
-              value: /keycloak-realm-json/keycloak-realm.json
-            - name: KEYCLOAK_MO_CLIENT_REDIRECT_URI
-              value: "[\"{{ $protocol }}://{{ .Values.ingress.hostname }}/*\"]"
-            - name: KEYCLOAK_MO_CLIENT_WEB_ORIGIN
-              value: "[\"{{ $protocol }}://{{ .Values.ingress.hostname }}\"]"
-            - name: KEYCLOAK_DIPEX_CLIENT_ENABLED
-              value: 'true'
-            - name: KEYCLOAK_DIPEX_CLIENT_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: keycloak-dipex-secret
-                  key: client_secret
-            - name: KEYCLOAK_LORA_REALM_ENABLED
-              value: "{{ .Values.keycloak.builder.lora_realm_enabled }}"
-            {{- if .Values.keycloak.builder.lora_realm_enabled }}
-            - name: KEYCLOAK_LORA_CLIENT_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: keycloak-lora-client-secret
-                  key: client_secret
-            - name: KEYCLOAK_LORA_DIPEX_CLIENT_ENABLED
-              value: "{{ .Values.keycloak.builder.lora_dipex_client_enabled }}"
-            {{- if .Values.keycloak.builder.lora_dipex_client_enabled }}
-            - name: KEYCLOAK_LORA_DIPEX_CLIENT_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: keycloak-lora-dipex-secret
-                  key: client_secret
-            {{- end }}
-            {{- end }}
-          resources:
-            {{- toYaml .Values.initContainers.resources | nindent 12 }}
-          volumeMounts:
-            - name: keycloak-realm-json
-              mountPath: /keycloak-realm-json
-        {{- end }}
