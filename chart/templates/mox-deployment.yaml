@@ -183,7 +183,10 @@ spec:
           args: ['while [ $(curl -ksw "%{http_code}" "http://keycloak-service:8080/auth/realms/master" -o /dev/null) -ne 200 ]; do sleep 1; echo "Waiting for Keycloak to be ready"; done; echo "OK"']
           resources:
             {{- toYaml .Values.initContainers.resources | nindent 12 }}
-        {{- if include "useTerraformRealmBuilder" . }}
+
+        {{- if (semverCompare "<3.24.0" .Values.keycloak.builder.image.tag) }}
+          {{- fail "Realm builder version must be at least 3.0.0 when probes are enabled" }}
+        {{- end }}
         - name: keycloak-realm-builder
           image: "{{ .Values.keycloak.builder.image.repository }}:{{ .Values.keycloak.builder.image.tag }}"
           imagePullPolicy: {{ .Values.keycloak.builder.image.pullPolicy }}
@@ -191,11 +194,6 @@ spec:
             - configMapRef:
                 name: keycloak-gen-config
           env:
-            - name: POSTGRES_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: mox-secret
-                  key: db_password
             - name: KEYCLOAK_DB_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -258,5 +256,4 @@ spec:
               value: "Unspecified"
           resources:
             {{- toYaml .Values.initContainers.resources | nindent 12 }}
-        {{- end }}
       restartPolicy: Always
