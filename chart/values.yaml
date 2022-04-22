@@ -25,6 +25,10 @@ ingress:
     key: null
     cert: null
 
+amqp:
+  enabled: false
+  url_secret: null
+
 os2mo:
   replicaCount: 1
   image:

@@ -48,6 +48,22 @@ spec:
             - name: LORA_URL
               value: "http://mox-service:8080/"
 
+            # AMQP
+            {{- $missing_url_secret := empty .Values.amqp.url_secret }}
+            {{- if .Values.amqp.enabled }}
+            {{- if (semverCompare "<4.5.0" .Values.os2mo.image.tag) }}
+              {{- fail "MO version must be at least 4.5.0 when AMQP is enabled" }}
+            {{- else if $missing_url_secret }}
+              {{- fail "Must have url_secret set if AMQP is enabled" }}
+            {{- else }}
+            - name: AMQP_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.amqp.url_secret }}
+                  key: url
+            {{- end }}
+            {{- end }}
+
             # Confdb
             - name: CONF_DB_USE
               value: "false"
@@ -68,11 +84,7 @@ spec:
             - name: KEYCLOAK_AUTH_SERVER_URL
               value: "{{ $protocol }}://{{ .Values.ingress.hostname }}/auth/"
             - name: KEYCLOAK_MO_CLIENT
-            {{- if include "useTerraformRealmBuilder" . }}
               value: "mo-frontend"
-            {{- else }}
-              value: "mo"
-            {{- end }}
           envFrom:
 {{ if .Values.os2mo.external_env_config_map_name }}
           - configMapRef:
