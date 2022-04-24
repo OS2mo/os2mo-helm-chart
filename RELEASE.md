@@ -1,3 +1,3 @@
 Release type: minor
 
-[#49745] Introduce SD client secret
+[#49745] Rework orgviewer client secrets

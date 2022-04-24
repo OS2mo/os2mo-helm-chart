@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MPL-2.0
 ---
 {{- if .Values.orgviewer.adm.enabled }}
+{{- $keycloak_client_id := "integration_orgviewer_adm" }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -44,10 +45,13 @@ spec:
             - name: GLOBAL_API_ROOT_UUID
               value: {{ .Values.orgviewer.adm.org_uuid }}
 
+            - name: KEYCLOAK_CLIENT_ID
+              value: $keycloak_client_id
+
             - name: KEYCLOAK_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: keycloak-orgviewer-client-secret
+                  name: orgviewer-adm-client-secret
                   key: client_secret
 
             - name: KEYCLOAK_BASEURL
@@ -81,6 +85,35 @@ spec:
           image: curlimages/curl
           command: ["/bin/sh","-c"]
           args: ['while [ $(curl -ksw "%{http_code}" "http://mox-service:8080/site-map" -o /dev/null) -ne 200 ]; do sleep 1; echo "Waiting for MOX to be ready"; done; echo "OK"']
+          resources:
+            {{- toYaml .Values.initContainers.resources | nindent 12 }}
+        - name: create-client-secret
+          image: "{{ .Values.keycloak.integration-builder.image.repository }}:{{ .Values.keycloak.integration-builder.image.tag }}"
+          imagePullPolicy: {{ .Values.keycloak.integration-builder.image.pullPolicy }}
+          env:
+            # Postgres state connection
+            - name: POSTGRES_CONNECTION_STRING
+              value: "postgres://keycloak:$(KEYCLOAK_DB_PASSWORD)@{{ .Values.database.host }}/keycloak?sslmode={{ $sslmode }}"
+            - name: POSTGRES_SCHEMA_NAME
+              value: terraform_remote_state_orgviewer_adm
+
+            # Keycloak REST connection
+            - name: TF_VAR_KEYCLOAK_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: keycloak-admin-secret
+                  key: admin_password
+
+            # Configuration of the client
+            - name: TF_VAR_keycloak_client_name
+              value: $keycloak_client_id
+            - name: TF_VAR_keycloak_client_roles
+              value: '["reader"]'
+            - name: TF_VAR_keycloak_client_secret
+              valueFrom:
+                secretKeyRef:
+                  name: orgviewer-adm-client-secret
+                  key: client_secret
           resources:
             {{- toYaml .Values.initContainers.resources | nindent 12 }}
       restartPolicy: Always
