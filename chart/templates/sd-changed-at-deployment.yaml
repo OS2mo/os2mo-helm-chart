@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MPL-2.0
 ---
 {{- if .Values.sd_changed_at.enabled }}
+{{- $keycloak_client_id := "integration_sd_changed_at" }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -57,11 +58,11 @@ spec:
             - name: AUTH_REALM
               value: "mo"
             - name: CLIENT_ID
-              value: "dipex"
+              value: $keycloak_client_id
             - name: CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: keycloak-dipex-secret
+                  name: sd-changed-at-client-secret
                   key: client_secret
 
             # The three ENVs below require an sd-secret created in Flux
@@ -108,6 +109,35 @@ spec:
           image: curlimages/curl
           command: ["/bin/sh","-c"]
           args: ['while [ $(curl -ksw "%{http_code}" "http://mo-service:5000/" -o /dev/null) -ne 200 ]; do sleep 1; echo "Waiting for MO to be ready"; done; echo "OK"']
+          resources:
+            {{- toYaml .Values.initContainers.resources | nindent 12 }}
+        - name: create-client-secret
+          image: "{{ .Values.keycloak.integration-builder.image.repository }}:{{ .Values.keycloak.integration-builder.image.tag }}"
+          imagePullPolicy: {{ .Values.keycloak.integration-builder.image.pullPolicy }}
+          env:
+            # Postgres state connection
+            - name: POSTGRES_CONNECTION_STRING
+              value: "postgres://keycloak:$(KEYCLOAK_DB_PASSWORD)@{{ .Values.database.host }}/keycloak?sslmode={{ $sslmode }}"
+            - name: POSTGRES_SCHEMA_NAME
+              value: terraform_remote_state_sd_changed_at
+
+            # Keycloak REST connection
+            - name: TF_VAR_KEYCLOAK_ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: keycloak-admin-secret
+                  key: admin_password
+
+            # Configuration of the client
+            - name: TF_VAR_keycloak_client_name
+              value: $keycloak_client_id
+            - name: TF_VAR_keycloak_client_roles
+              value: '["admin"]'
+            - name: TF_VAR_keycloak_client_secret
+              valueFrom:
+                secretKeyRef:
+                  name: sd-changed-at-client-secret
+                  key: client_secret
           resources:
             {{- toYaml .Values.initContainers.resources | nindent 12 }}
         - name: prepare-run-db
