@@ -37,7 +37,7 @@ spec:
             - name: AUTH_REALM
               value: "mo"
             - name: CLIENT_ID
-              value: $keycloak_client_id
+              value: "{{ $keycloak_client_id }}"
             - name: CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
@@ -92,7 +92,7 @@ spec:
 
             # Configuration of the client
             - name: TF_VAR_client_name
-              value: $keycloak_client_id
+              value: "{{ $keycloak_client_id }}"
             - name: TF_VAR_client_roles
               value: '["admin"]'
             - name: TF_VAR_client_secret
