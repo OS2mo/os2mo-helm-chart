@@ -51,7 +51,7 @@ spec:
               value: {{ .Values.database.sslmode }}
             {{ end }}
             - name: DB_NAME
-              value: "mox"
+              value: {{ include "mox_db_name" . }}
             - name: DB_USER
               value: "mox{{ .Values.database.username_suffix }}"
             - name: DB_PASSWORD
@@ -123,30 +123,13 @@ spec:
 
             # The below are intentionally without suffix
             - name: DB_NAME
-              value: "mox"
+              value: {{ include "mox_db_name" . }}
             - name: DB_USER
               value: "mox"
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: mox-secret
-                  key: db_password
-
-            - name: SESSIONS_DB_NAME
-              value: "sessions"
-            - name: SESSIONS_DB_USER
-              value: "sessions"
-            - name: SESSIONS_DB_PASSWORD
-              value: "sessions"
-
-            - name: CONF_DB_NAME
-              value: "mora"
-            - name: CONF_DB_USER
-              value: "mora"
-            - name: CONF_DB_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: mo-secret
                   key: db_password
           resources:
             {{- toYaml .Values.initContainers.resources | nindent 12 }}
@@ -162,7 +145,7 @@ spec:
               value: {{ .Values.database.sslmode }}
             {{ end }}
             - name: PGDATABASE
-              value: "mox"
+              value: {{ include "mox_db_name" . }}
             - name: PGUSER
               value: "{{ .Values.database.user }}{{ .Values.database.username_suffix }}"
             - name: PGPASSWORD
@@ -196,15 +179,8 @@ spec:
             - configMapRef:
                 name: keycloak-gen-config
           env:
-            - name: KEYCLOAK_DB_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: keycloak-secret
-                  key: db_password
-            {{- $use_ssl := (ne .Values.database.sslmode "") }}
-            {{- $sslmode := ternary "require" "disable" $use_ssl }}
-            - name: POSTGRES_CONNECTION_STRING
-              value: "postgres://keycloak:$(KEYCLOAK_DB_PASSWORD)@{{ .Values.database.host }}/keycloak?sslmode={{ $sslmode }}"
+            {{ include "keycloak_terraform_db_connection" .  | nindent 12 }}
+
             - name: KEYCLOAK_ADMIN_USERNAME
               value: "admin"
             - name: KEYCLOAK_ADMIN_PASSWORD

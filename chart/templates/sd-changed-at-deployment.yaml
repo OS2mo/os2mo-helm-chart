@@ -115,11 +115,7 @@ spec:
           image: "{{ .Values.keycloak.integrationbuilder.image.repository }}:{{ .Values.keycloak.integrationbuilder.image.tag }}"
           imagePullPolicy: {{ .Values.keycloak.integrationbuilder.image.pullPolicy }}
           env:
-            # Postgres state connection
-            {{- $use_ssl := (ne .Values.database.sslmode "") }}
-            {{- $sslmode := ternary "require" "disable" $use_ssl }}
-            - name: POSTGRES_CONNECTION_STRING
-              value: "postgres://keycloak:$(KEYCLOAK_DB_PASSWORD)@{{ .Values.database.host }}/keycloak?sslmode={{ $sslmode }}"
+            {{ include "keycloak_terraform_db_connection" .  | nindent 12 }}
             - name: POSTGRES_SCHEMA_NAME
               value: terraform_remote_state_sd_changed_at
 
