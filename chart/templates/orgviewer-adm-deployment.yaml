@@ -69,19 +69,7 @@ spec:
           resources:
             {{- toYaml .Values.orgviewer.adm.resources | nindent 12 }}
       initContainers:
-        - name: wait-for-keycloak
-          image: curlimages/curl
-          command: ["/bin/sh","-c"]
-          args: ['while [ $(curl -ksw "%{http_code}" "http://keycloak-service:8080/auth/realms/master" -o /dev/null) -ne 200 ]; do sleep 1; echo "Waiting for Keycloak to be ready"; done; echo "OK"']
-          resources:
-            {{- toYaml .Values.initContainers.resources | nindent 12 }}
-        # What we are really waiting for is for keycloak to be up _and_ have
-        # our client registered.
-        - name: wait-for-mox
-          image: curlimages/curl
-          command: ["/bin/sh","-c"]
-          args: ['while [ $(curl -ksw "%{http_code}" "http://mox-service:8080/site-map" -o /dev/null) -ne 200 ]; do sleep 1; echo "Waiting for MOX to be ready"; done; echo "OK"']
-          resources:
-            {{- toYaml .Values.initContainers.resources | nindent 12 }}
+        {{ include "wait-for-keycloak" . | nindent 8 }}
+        {{ include "wait-for-mox" . | nindent 8 }}
       restartPolicy: Always
 {{- end }}

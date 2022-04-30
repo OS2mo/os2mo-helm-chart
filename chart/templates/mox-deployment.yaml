@@ -176,13 +176,9 @@ spec:
                   key: db_password
           resources:
             {{- toYaml .Values.initContainers.resources | nindent 12 }}
-        {{ end }}
-        - name: wait-for-keycloak
-          image: curlimages/curl
-          command: ["/bin/sh","-c"]
-          args: ['while [ $(curl -ksw "%{http_code}" "http://keycloak-service:8080/auth/realms/master" -o /dev/null) -ne 200 ]; do sleep 1; echo "Waiting for Keycloak to be ready"; done; echo "OK"']
-          resources:
-            {{- toYaml .Values.initContainers.resources | nindent 12 }}
+          {{ end }}
+
+        {{ include "wait-for-keycloak" . | nindent 8 }}
 
           {{- if ne .Values.keycloak.builder.image.tag "latest" }}
             {{- if (semverCompare "<3.0.0" .Values.keycloak.builder.image.tag) }}

@@ -125,24 +125,9 @@ spec:
             periodSeconds: {{ .Values.os2mo.probes.startupProbe.periodSeconds }}
           {{- end }}
       initContainers:
-        - name: wait-for-mox
-          image: curlimages/curl
-          command: ["/bin/sh","-c"]
-          args: ['while [ $(curl -ksw "%{http_code}" "http://mox-service:8080/site-map" -o /dev/null) -ne 200 ]; do sleep 1; echo "Waiting for MOX to be ready"; done; echo "OK"']
-          resources:
-            {{- toYaml .Values.initContainers.resources | nindent 12 }}
-        - name: wait-for-keycloak
-          image: curlimages/curl
-          command: ["/bin/sh","-c"]
-          args: ['while [ $(curl -ksw "%{http_code}" "http://keycloak-service:8080/auth/realms/master" -o /dev/null) -ne 200 ]; do sleep 1; echo "Waiting for Keycloak to be ready"; done; echo "OK"']
-          resources:
-            {{- toYaml .Values.initContainers.resources | nindent 12 }}
+        {{ include "wait-for-keycloak" . | nindent 8 }}
+        {{ include "wait-for-mox" . | nindent 8 }}
         {{- if .Values.sdtool.enabled }}
-        - name: wait-for-sdtool
-          image: curlimages/curl
-          command: ["/bin/sh","-c"]
-          args: ['while [ $(curl -ksw "%{http_code}" "http://sdtool-service/triggers" -o /dev/null) -ne 200 ]; do sleep 1; echo "Waiting for SDTool to be ready"; done; echo "OK"']
-          resources:
-            {{- toYaml .Values.initContainers.resources | nindent 12 }}
+        {{ include "wait-for-sdtool" . | nindent 8 }}
         {{- end }}
       restartPolicy: Always

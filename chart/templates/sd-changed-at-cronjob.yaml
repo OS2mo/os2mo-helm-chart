@@ -33,16 +33,6 @@ spec:
                   memory: "128Mi"
                   cpu: "10m"
           initContainers:
-            - name: wait-for-sd-changed-at
-              image: curlimages/curl
-              command: ["/bin/sh","-c"]
-              args: ['while [ $(curl -ksw "%{http_code}" "http://sd-changed-at-service:8000/" -o /dev/null) -ne 200 ]; do sleep 1; echo "Waiting for SD-changed-at to be ready"; done; echo "OK"']
-              resources:
-                requests:
-                  memory: "64Mi"
-                  cpu: "5m"
-                limits:
-                  memory: "128Mi"
-                  cpu: "10m"
+            {{ include "wait-for-sd-changed-at" . | nindent 8 }}
           restartPolicy: OnFailure
 {{- end }}
