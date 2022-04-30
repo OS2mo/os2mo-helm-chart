@@ -176,6 +176,7 @@ database:
   # Hostname for the database
   host: mox-db-service
   user: postgres
+  db_prefix: ""
   # Name of the secret to use for external database.
   # If not set, it will be generated with the below password.
   password_secret: null

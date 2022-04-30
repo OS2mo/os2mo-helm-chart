@@ -53,7 +53,7 @@ spec:
             - name: DB_ADDR
               value: {{ .Values.database.host }}
             - name: DB_DATABASE
-              value: keycloak
+              value: {{ template "keycloak_db_name" . }}
             - name: DB_SCHEMA
               value: public
             - name: DB_USER
@@ -116,7 +116,7 @@ spec:
 
             # The below are intentionally without suffix
             - name: KEYCLOAK_DB_NAME
-              value: "keycloak"
+              value: {{ template "keycloak_db_name" . }}
             - name: KEYCLOAK_DB_USER
               value: "keycloak"
             - name: KEYCLOAK_DB_PASSWORD

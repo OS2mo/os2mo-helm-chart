@@ -64,3 +64,17 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{- define "keycloak_db_name" -}}
+{{ .Values.database.db_prefix }}_keycloak
+{{- end }}
+
+{{- define "keycloak_db_connection_string" -}}
+{{- $use_ssl := (ne .Values.database.sslmode "") -}}
+{{- $sslmode := ternary "require" "disable" $use_ssl -}}
+postgres://keycloak:$(KEYCLOAK_DB_PASSWORD)@{{ .Values.database.host }}/{{ include "keycloak_db_name" . }}?sslmode={{ $sslmode }}"
+{{- end }}
+
+{{- define "mox_db_name" -}}
+{{ .Values.database.db_prefix }}_mox
+{{- end }}
