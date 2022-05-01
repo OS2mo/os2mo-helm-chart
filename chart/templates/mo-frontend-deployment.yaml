@@ -1,0 +1,59 @@
+# SPDX-FileCopyrightText: Magenta ApS
+#
+# SPDX-License-Identifier: MPL-2.0
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mo-frontend-deployment
+  labels:
+    app: mo-frontend
+  {{- with .Values.annotations }}
+  annotations:
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  replicas: {{ .Values.os2mo.frontend.replicaCount }}
+  selector:
+    matchLabels:
+      app: mo-frontend
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: mo-frontend
+    spec:
+      {{- if not (empty .Values.os2mo.frontend.image.pullSecret) }}
+      imagePullSecrets:
+        - name: {{ .Values.os2mo.frontend.image.pullSecret }}
+      {{- end }}
+      containers:
+        - name: mo-frontend
+          image: "{{ .Values.os2mo.frontend.image.repository }}:{{ .Values.os2mo.frontend.image.tag }}"
+          imagePullPolicy: {{ .Values.os2mo.frontend.image.pullPolicy }}
+          ports:
+            - containerPort: 80
+          resources:
+            {{- toYaml .Values.os2mo.frontend.resources | nindent 12 }}
+          livenessProbe:
+            httpGet:
+              path: /index.html
+              port: 80
+            periodSeconds: {{ .Values.os2mo.frontend.probes.liveness.periodSeconds }}
+            timeoutSeconds: {{ .Values.os2mo.frontend.probes.liveness.timeoutSeconds }}
+            failureThreshold: {{ .Values.os2mo.frontend.probes.liveness.failureThreshold }}
+          readinessProbe:
+            httpGet:
+              path: /index.html
+              port: 80
+            periodSeconds: {{ .Values.os2mo.frontend.probes.readiness.periodSeconds }}
+            timeoutSeconds: {{ .Values.os2mo.frontend.probes.readiness.timeoutSeconds }}
+            failureThreshold: {{ .Values.os2mo.frontend.probes.readiness.failureThreshold }}
+          startupProbe:
+            httpGet:
+              path: /index.html
+              port: 80
+            failureThreshold: {{ .Values.os2mo.frontend.probes.startupProbe.failureThreshold }}
+            periodSeconds: {{ .Values.os2mo.frontend.probes.startupProbe.periodSeconds }}
+      restartPolicy: Always

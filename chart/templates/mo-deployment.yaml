@@ -68,6 +68,9 @@ spec:
             - name: CONF_DB_USE
               value: "false"
 
+            - name: TESTCAFE_ENABLE
+              value: "false"
+
             # gunicorn MAX_WORKERS
             - name: MAX_WORKERS
               value: "{{ .Values.os2mo.gunicorn.max_workers }}"

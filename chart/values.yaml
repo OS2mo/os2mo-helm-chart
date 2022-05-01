@@ -71,6 +71,35 @@ os2mo:
       timeoutSeconds: 1
       failureThreshold: 3
 
+  frontend:
+    replicaCount: 1
+    image:
+      repository: magentaaps/os2mo
+      tag: latest
+      pullPolicy: Always
+      pullSecret: null
+    resources:
+      requests:
+        memory: "1024Mi"
+        cpu: "500m"
+      limits:
+        memory: "1536Mi"
+        cpu: "1000m"
+    probes:
+      startupProbe:
+        failureThreshold: 150
+        periodSeconds: 2
+      liveness:
+        periodSeconds: 10
+        timeoutSeconds: 1
+        failureThreshold: 3
+      readiness:
+        periodSeconds: 10
+        timeoutSeconds: 1
+        failureThreshold: 3
+
+
+
 lora:
   replicaCount: 1
   image:
