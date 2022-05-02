@@ -66,7 +66,11 @@ Create the name of the service account to use
 {{- end }}
 
 {{- define "keycloak_db_name" -}}
+{{- if .Values.database.db_prefix }}
 {{ .Values.database.db_prefix }}_keycloak
+{{ - else }}
+keycloak
+{{- end }}
 {{- end }}
 
 {{- define "keycloak_db_connection_string" -}}
@@ -88,7 +92,11 @@ postgres://keycloak:$(KEYCLOAK_DB_PASSWORD)@{{ .Values.database.host }}/{{ inclu
 {{- end }}
 
 {{- define "mox_db_name" -}}
+{{- if .Values.database.db_prefix }}
 {{ .Values.database.db_prefix }}_mox
+{{ - else }}
+mox
+{{- end }}
 {{- end }}
 
 {{- define "wait-for-service" -}}
