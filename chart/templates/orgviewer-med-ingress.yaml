@@ -8,6 +8,9 @@ kind: Ingress
 metadata:
   name: orgviewer-med-ingress
 spec:
+  {{ if ne .Values.ingress.class "" }}
+    ingressClassName: {{ .Values.ingress.class }}
+  {{ end }}
   {{ if .Values.orgviewer.med.ingress.tls_secret }}
   tls:
     - hosts:

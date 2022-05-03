@@ -10,18 +10,10 @@ metadata:
   annotations:
   {{- toYaml . | nindent 4 }}
   {{- end }}
-{{ if ne .Values.ingress.class "" }}
-    kubernetes.io/ingress.class: {{ .Values.ingress.class }}
-{{ if .Values.ingress.whitelist }}
-    nginx.ingress.kubernetes.io/whitelist-source-range: {{ .Values.ingress.whitelist }}
-{{ end }}
-{{ if .Values.ingress.basic_auth }}
-    nginx.ingress.kubernetes.io/auth-type: basic
-    nginx.ingress.kubernetes.io/auth-secret: mo-ingress-basic-auth-secret
-    nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required - OS2mo'
-{{ end }}
-{{ end }}
 spec:
+  {{ if ne .Values.ingress.class "" }}
+    ingressClassName: {{ .Values.ingress.class }}
+  {{ end }}
   {{ if .Values.ingress.tls_secret }}
   tls:
     - hosts:

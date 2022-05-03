@@ -1,3 +1,3 @@
-Release type: patch
+Release type: minor
 
-[#48771] Fix wrong os2mo-frontend image
+[#50058] Set IngressClassName on all ingresses
