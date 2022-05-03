@@ -64,6 +64,9 @@ spec:
 
             - name: SD_TOO_DEEP
               value: {{ .Values.sdtool.sd_too_deep | quote }}
+          envFrom:
+            - configMapRef:
+                name: sdtool-config
           ports:
             - containerPort: 80
           resources:
