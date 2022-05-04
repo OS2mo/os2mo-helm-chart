@@ -84,7 +84,7 @@ keycloak
 {{- define "keycloak_db_connection_string" -}}
 {{- $use_ssl := (ne .Values.database.sslmode "") -}}
 {{- $sslmode := ternary "require" "disable" $use_ssl -}}
-postgres://keycloak:$(KEYCLOAK_DB_PASSWORD)@{{ .Values.database.host }}/{{ include "keycloak_db_name" . }}?sslmode={{ $sslmode }}
+postgres://{{ include "keycloak_db_user" . }}:$(KEYCLOAK_DB_PASSWORD)@{{ .Values.database.host }}/{{ include "keycloak_db_name" . }}?sslmode={{ $sslmode }}
 {{- end }}
 
 {{- define "keycloak_terraform_db_connection" -}}

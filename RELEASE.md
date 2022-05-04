@@ -1,3 +1,3 @@
-Release type: minor
+Release type: patch
 
-[#48771] Add db_prefix to usernames
+[#48771] Fix bad keycloak connection string
