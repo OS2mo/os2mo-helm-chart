@@ -57,7 +57,7 @@ spec:
             - name: DB_SCHEMA
               value: public
             - name: DB_USER
-              value: "keycloak{{ .Values.database.username_suffix }}"
+              value: {{ template "keycloak_db_user" . }}
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -98,8 +98,6 @@ spec:
               value: {{ .Values.database.host }}
             - name: POSTGRES_USER
               value: "{{ .Values.database.user }}"
-            - name: POSTGRES_USER_SUFFIX
-              value: "{{ .Values.database.username_suffix }}"
             {{ if ne .Values.database.sslmode "" }}
             - name: POSTGRES_SSL
               value: {{ .Values.database.sslmode }}
@@ -114,11 +112,10 @@ spec:
                   {{ end }}
                   key: db_password
 
-            # The below are intentionally without suffix
             - name: KEYCLOAK_DB_NAME
               value: {{ template "keycloak_db_name" . }}
             - name: KEYCLOAK_DB_USER
-              value: "keycloak"
+              value: {{ template "keycloak_db_user" . }}
             - name: KEYCLOAK_DB_PASSWORD
               valueFrom:
                 secretKeyRef:

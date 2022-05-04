@@ -53,7 +53,7 @@ spec:
             - name: DB_NAME
               value: {{ include "mox_db_name" . }}
             - name: DB_USER
-              value: "mox{{ .Values.database.username_suffix }}"
+              value: {{ include "mox_db_user" . }}
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -101,8 +101,6 @@ spec:
               value: {{ .Values.database.host }}
             - name: POSTGRES_USER
               value: "{{ .Values.database.user }}"
-            - name: POSTGRES_USER_SUFFIX
-              value: "{{ .Values.database.username_suffix }}"
             {{- if .Values.lora.init.make_superuser }}
             - name: MAKE_SUPERUSER
               value: "true"
@@ -121,11 +119,10 @@ spec:
                   {{ end }}
                   key: db_password
 
-            # The below are intentionally without suffix
             - name: DB_NAME
               value: {{ include "mox_db_name" . }}
             - name: DB_USER
-              value: "mox"
+              value: {{ include "mox_db_user" . }}
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -147,7 +144,7 @@ spec:
             - name: PGDATABASE
               value: {{ include "mox_db_name" . }}
             - name: PGUSER
-              value: "{{ .Values.database.user }}{{ .Values.database.username_suffix }}"
+              value: {{ .Values.database.user }}
             - name: PGPASSWORD
               valueFrom:
                 secretKeyRef:
