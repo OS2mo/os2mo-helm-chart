@@ -1,0 +1,68 @@
+# SPDX-FileCopyrightText: Magenta ApS
+#
+# SPDX-License-Identifier: MPL-2.0
+---
+{{- if .Values.os2sync.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: os2sync
+  labels:
+    app: os2sync
+  {{- with .Values.annotations }}
+  annotations:
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  selector:
+    matchLabels:
+      app: os2sync
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: os2sync
+    spec:
+      containers:
+        - name: os2sync
+          image: "{{ .Values.os2sync.image.repository }}:{{ .Values.os2sync.image.tag }}"
+          imagePullPolicy: {{ .Values.os2sync.image.pullPolicy }}
+          env:
+            - name: ClientCertPath
+              value: {{ .Values.os2sync.client_cert_path | quote }}
+            - name: ClientCertPassword
+              valueFrom:
+                secretKeyRef:
+                  name: os2sync-secret
+                  key: client_cert_password
+            - name: DisableRevocationCheck
+              value: {{ .Values.os2sync.disable_revocation_check | quote }}
+            - name: LogRequestResponse
+              value: {{ .Values.os2sync.log_request_response | quote }}
+            - name: Municipality
+              value: {{ required "The Municipality ENV is missing" .Values.os2sync.municipality | quote }}
+            - name: EnableScheduler
+              value: {{ .Values.os2sync.enable_scheduler | quote }}
+            - name: Environment
+              value: {{ .Values.os2sync.environment | quote }}
+            - name: LogLevel
+              value: {{ .Values.os2sync.log_level | quote }}
+            - name: DatabaseType
+              value: MYSQL
+            - name: DB_NAME
+              value: {{ required "The OS2sync DB_NAME ENV is missing" .Values.os2sync.db_name | quote }}
+            - name: DB_USERNAME
+              value: {{ required "The OS2sync DB_USERNAME ENV is missing" .Values.os2sync.db_username | quote }}
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: os2sync-secret
+                  key: db_password
+            - name: DBConnectionString
+              value: "server=mysql;user id=$(DB_USERNAME);password=$(DB_PASSWORD);database=$(DB_NAME);persistsecurityinfo=True;port=3306;"
+          ports:
+            - containerPort: 5000
+          resources:
+            {{- toYaml .Values.os2sync.resources | nindent 12 }}
+{{- end }}

@@ -324,3 +324,26 @@ orgviewer:
       limits:
         memory: "1024Mi"
         cpu: "250m"
+
+os2sync:
+  enabled: false
+  image:
+    repository: os2sync/linux
+    tag: 2.0.3
+    pullPolicy: Always
+  client_cert_path: /certificate/certificate.p12
+  disable_revocation_check: true
+  log_request_response: true
+  log_level: DEBUG
+  # Note: os2sync specific - not used in the same way as
+  # the environment value elsewhere in this chart
+  enable_scheduler: true
+  environment: PROD
+  mysql_version: 8.0.29
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "100m"
+    limits:
+      memory: "1024Mi"
+      cpu: "250m"

@@ -40,7 +40,6 @@ keycloak:
   builder:
     lora_realm_enabled: true
     lora_dipex_client_enabled: true
-    orgviewer_client_enabled: true
     environment:
       KEYCLOAK_SSL_REQUIRED_MO: none
       KEYCLOAK_SSL_REQUIRED_LORA: none
@@ -87,3 +86,9 @@ orgviewer:
     title: "Administrativ organisation"
     ingress:
       hostname: orgviewer-adm.example.com
+
+os2sync:
+  enabled: false
+  municipality: Pladderballe Kommune
+  db_name: db-name
+  db_username: db-username
