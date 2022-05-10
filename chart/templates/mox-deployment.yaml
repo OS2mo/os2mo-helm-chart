@@ -44,6 +44,9 @@ spec:
             - name: MAX_WORKERS
               value: "{{ .Values.lora.gunicorn.max_workers }}"
 
+            - name: DISABLE_ALEMBIC
+              value: "true"
+
             - name: DB_HOST
               value: {{ .Values.database.host }}
             {{ if ne .Values.database.sslmode "" }}
@@ -128,6 +131,33 @@ spec:
                   key: db_password
           resources:
             {{- toYaml .Values.initContainers.resources | nindent 12 }}
+        - name: alembic
+          image: "{{ .Values.lora.image.repository }}:{{ .Values.lora.image.tag }}"
+          imagePullPolicy: {{ .Values.lora.image.pullPolicy }}
+          command: ["python3", "-m", "oio_rest", "initdb", "--wait", "30"]
+          env:
+            - name: DB_HOST
+              value: {{ .Values.database.host }}
+            {{ if ne .Values.database.sslmode "" }}
+            - name: DB_SSLMODE
+              value: {{ .Values.database.sslmode }}
+            {{ end }}
+            - name: DB_NAME
+              value: {{ include "mox_db_name" . }}
+            - name: DB_USER
+              value: {{ include "mox_db_user" . }}
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mox-secret
+                  key: db_password
+            - name: DB_EXTENSIONS_PATH
+              value: "oio_rest/oio_rest/db_extensions/mo-01.json"
+          envFrom:
+            - configMapRef:
+                name: mox-config
+          resources:
+            {{- toYaml .Values.lora.resources | nindent 12 }}
         {{ if .Values.fixture }}
         - name: fixture-loader
           image: magentaaps/os2mo-fixture-loader:latest
