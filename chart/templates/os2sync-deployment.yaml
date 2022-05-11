@@ -75,7 +75,7 @@ spec:
         - name: create-certificate-file
           image: busybox
           command: ["/bin/sh", "-c"]
-          args: ["echo ${OS2SYNC_CERT_BASE64} | base64 -d > /certificate/certificate.p12"]
+          args: ['echo "${OS2SYNC_CERT_BASE64}" | base64 -d > /certificate/certificate.p12']
           env:
             # The base64 encoded PKCS12 cert goes into this ENV
             # The value of the ENV can be created with "base64 /path/to/certificate.p12"
