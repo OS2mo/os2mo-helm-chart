@@ -117,7 +117,7 @@ Or similar, subject to the cluster in question.
 
 Simply run:
 ```shell
-helm install chart/ --generate-name
+helm install os2mo/ --generate-name
 ```
 After which OS2mo will be available on the cluster ingress.
 
@@ -140,11 +140,11 @@ Currently there are two ways of getting data into OS2mo:
 
 Using the fixture loader is simple, simply set `fixture` to the desired fixture dataset as a values override:
 ```shell
-helm install chart/ --generate-name --set-string fixture=kolding
+helm install os2mo/ --generate-name --set-string fixture=kolding
 ```
 Or using an `values-override.yaml` file
 ```shell
-helm install chart/ --generate-name -f values-override.yaml
+helm install os2mo/ --generate-name -f values-override.yaml
 ```
 *Note: Use `helm upgrade` if a deployment has already been made.*
 

@@ -19,8 +19,8 @@ Assuming <a href="https://kubernetes.io/docs/tasks/tools/">`kubectl`</a> and
 and <a href="https://kubernetes.io/docs/tasks/access-application-cluster/access-cluster/">cluster access is configured</a>:
 
 ```console
-$ helm install mo chart/
-$ helm install mo -f kind-override-values.yaml chart/
+$ helm install mo os2mo/
+$ helm install mo -f kind-override-values.yaml os2mo/
 ```
 
 Which should bring up an OS2mo stack.
