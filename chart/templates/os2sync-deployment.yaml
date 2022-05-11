@@ -53,9 +53,9 @@ spec:
             - name: DB_HOST
               value: {{ required "The OS2sync DB_HOST ENV is missing" .Values.os2sync.db_host | quote }}
             - name: DB_NAME
-              value: {{ required "The OS2sync DB_NAME ENV is missing" .Values.os2sync.db_name | quote }}
+              value: {{ .Values.os2sync.db_name | quote }}
             - name: DB_USERNAME
-              value: {{ required "The OS2sync DB_USERNAME ENV is missing" .Values.os2sync.db_username | quote }}
+              value: {{ .Values.os2sync.db_username | quote }}
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:

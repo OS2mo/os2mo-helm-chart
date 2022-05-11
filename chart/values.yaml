@@ -338,7 +338,10 @@ os2sync:
   # the environment value elsewhere in this chart
   enable_scheduler: true
   environment: PROD
+  # Set this to the municipality CVR
+  municipality: null
   mysql_version: 8.0.29
+  db_host: null
   db_name: os2sync
   db_username: os2sync_admin
   resources:
