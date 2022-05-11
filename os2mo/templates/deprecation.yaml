@@ -1,7 +1,0 @@
----
-# SPDX-FileCopyrightText: Magenta ApS
-#
-# SPDX-License-Identifier: MPL-2.0
-{{- if .Values.keycloak.builder.orgviewer_client_enabled }}
-    {{- fail "'keycloak.builder.orgviewer_client_enabled' has been removed" }}
-{{- end }}
