@@ -1,0 +1,16 @@
+# SPDX-FileCopyrightText: Magenta ApS
+#
+# SPDX-License-Identifier: MPL-2.0
+---
+{{- if .Values.metrics.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: mox-service
+spec:
+  selector:
+    matchLabels:
+      app: mox
+  endpoints:
+  - port: "8080"
+{{- end }}

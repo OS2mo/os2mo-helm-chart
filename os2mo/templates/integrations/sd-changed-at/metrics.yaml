@@ -1,0 +1,18 @@
+# SPDX-FileCopyrightText: Magenta ApS
+#
+# SPDX-License-Identifier: MPL-2.0
+---
+{{- if .Values.metrics.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: sd-changed-at
+  labels:
+    app: sd-changed-at
+spec:
+  selector:
+    matchLabels:
+      app: sd-changed-at
+  endpoints:
+  - port: "8000"
+{{- end }}
