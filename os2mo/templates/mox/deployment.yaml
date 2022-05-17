@@ -129,6 +129,35 @@ spec:
                   key: db_password
           resources:
             {{- toYaml .Values.initContainers.resources | nindent 12 }}
+
+        {{ if .Values.fixture }}
+        - name: fixture-loader
+          image: magentaaps/os2mo-fixture-loader:latest
+          args: [ {{ .Values.fixture }} ]
+          env:
+            - name: PGHOST
+              value: {{ .Values.database.host }}
+                {{ if ne .Values.database.sslmode "" }}
+            - name: PGSSLMODE
+              value: {{ .Values.database.sslmode }}
+                {{ end }}
+            - name: PGDATABASE
+              value: {{ include "mox_db_name" . }}
+            - name: PGUSER
+              value: {{ .Values.database.user }}
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                      {{ if .Values.database.password_secret }}
+                  name: {{ .Values.database.password_secret }}
+                      {{ else }}
+                  name: mox-db-secret
+                      {{ end }}
+                  key: db_password
+          resources:
+            {{- toYaml .Values.initContainers.resources | nindent 12 }}
+        {{ end }}
+
         - name: alembic
           image: "{{ .Values.lora.image.repository }}:{{ .Values.lora.image.tag }}"
           imagePullPolicy: {{ .Values.lora.image.pullPolicy }}
@@ -154,33 +183,6 @@ spec:
                 name: mox-config
           resources:
             {{- toYaml .Values.lora.resources | nindent 12 }}
-        {{ if .Values.fixture }}
-        - name: fixture-loader
-          image: magentaaps/os2mo-fixture-loader:latest
-          args: [ {{ .Values.fixture }} ]
-          env:
-            - name: PGHOST
-              value: {{ .Values.database.host }}
-            {{ if ne .Values.database.sslmode "" }}
-            - name: PGSSLMODE
-              value: {{ .Values.database.sslmode }}
-            {{ end }}
-            - name: PGDATABASE
-              value: {{ include "mox_db_name" . }}
-            - name: PGUSER
-              value: {{ .Values.database.user }}
-            - name: PGPASSWORD
-              valueFrom:
-                secretKeyRef:
-                  {{ if .Values.database.password_secret }}
-                  name: {{ .Values.database.password_secret }}
-                  {{ else }}
-                  name: mox-db-secret
-                  {{ end }}
-                  key: db_password
-          resources:
-            {{- toYaml .Values.initContainers.resources | nindent 12 }}
-          {{ end }}
 
         {{ include "wait-for-keycloak" . | nindent 8 }}
 
