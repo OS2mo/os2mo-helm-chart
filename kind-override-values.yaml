@@ -103,6 +103,10 @@ fixture: "kolding"
 orgviewer:
   image:
     pullPolicy: Always
+  environment:
+    VUE_APP_LOGO_PATH: "https://silkeborg.dk/static/dist/svg/logo.svg"
+    VUE_APP_FAVICON_PATH: "https://silkeborg.dk/static/dist/favicons/apple-touch-icon.png"
+    VUE_APP_THEME_CSS: "silkeborg.css"
   med:
     enabled: true
     url: http://orgviewer-med.example.com

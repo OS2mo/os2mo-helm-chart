@@ -74,6 +74,9 @@ spec:
 
             - name: VUE_APP_TREE_LAYOUT
               value: "vertical"
+          envFrom:
+            - configMapRef:
+                name: orgviewer-environment-config
           ports:
             - containerPort: 80
           resources:

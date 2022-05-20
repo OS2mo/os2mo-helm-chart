@@ -295,6 +295,7 @@ orgviewer:
     repository: magentaaps/os2orgviewer
     tag: "2.3.0"
     pullPolicy: IfNotPresent
+  environment: {}
 
   med:
     enabled: false
