@@ -16,6 +16,7 @@ ingress:
   hostname: "os2mo.example.com"
   # Name of the TLS secret to use for ingress. If set TLS will be enabled.
   tls_secret: null
+  annotations: {}
 
 wait_for_service:
   image:
