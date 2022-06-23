@@ -133,7 +133,7 @@ mox
 {{- end }}
 
 {{- define "os2mo.wait-for-mo" -}}
-{{ ( include "os2mo.wait-for-service" (dict "name" "mo" "port" 5000 "url" "/" "resources" .Values.initContainers.resources "Values" .Values ) ) }}
+{{ ( include "os2mo.wait-for-service" (dict "name" "mo" "port" 5000 "url" "/health/ready" "resources" .Values.initContainers.resources "Values" .Values ) ) }}
 {{- end }}
 
 {{- define "os2mo.wait-for-mox" -}}
