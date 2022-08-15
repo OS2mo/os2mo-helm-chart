@@ -11,6 +11,14 @@
           }
         }
       }
+    },
+    "calculate_primary": {
+      "properties": {
+        "integration": {
+            "type": "string",
+            "enum": ["DEFAULT", "SD", "OPUS"]
+        }
+      }
     }
   },
   "required": []

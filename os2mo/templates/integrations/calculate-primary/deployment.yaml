@@ -1,0 +1,117 @@
+# SPDX-FileCopyrightText: Magenta ApS
+#
+# SPDX-License-Identifier: MPL-2.0
+---
+{{- if .Values.calculate_primary.enabled }}
+{{- $keycloak_client_id := "integration_calculate-primary" }}
+# TODO: see https://git.magenta.dk/rammearkitektur/os2mo-helm-chart/-/merge_requests/142#note_140651
+{{- if not .Values.amqp.enabled }}
+  {{- fail "Must have AMQP enabled if calculate-primary is enabled" }}
+{{- end }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: calculate-primary
+  labels:
+    app: calculate-primary
+  {{- with .Values.annotations }}
+  annotations:
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: calculate-primary
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: calculate-primary
+    spec:
+      containers:
+        - name: calculate-primary
+          image: "{{ .Values.calculate_primary.image.registry }}/{{ .Values.calculate_primary.image.repository }}:{{ .Values.calculate_primary.image.tag }}"
+          imagePullPolicy: {{ .Values.calculate_primary.image.pullPolicy }}
+          env:
+            - name: CLIENT_ID
+              value: "{{ $keycloak_client_id }}"
+            - name: CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: calculate-primary-client-secret
+                  key: client_secret
+
+            - name: AMQP_HOST
+              value: "{{ .Values.calculate_primary.amqp_host }}"
+
+            - name: AMQP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: amqp-secret
+                  key: amqp_password
+
+            - name: AMQP_INTEGRATION
+              value: "{{ .Values.calculate_primary.integration }}"
+
+            - name: MO_URL
+              value: "http://mo-service:5000"
+
+            - name: AUTH_REALM
+              value: "mo"
+
+            - name: AUTH_SERVER
+              value: "http://keycloak-service:8080/auth"
+          resources:
+            {{- toYaml .Values.calculate_primary.resources | nindent 12 }}
+      initContainers:
+        {{ include "os2mo.wait-for-keycloak" . | nindent 8 }}
+        - name: create-client-secret
+          image: "{{ .Values.keycloak.integrationbuilder.image.registry }}/{{ .Values.keycloak.integrationbuilder.image.repository }}:{{ .Values.keycloak.integrationbuilder.image.tag }}"
+          imagePullPolicy: {{ .Values.keycloak.integrationbuilder.image.pullPolicy }}
+          env:
+            {{ include "os2mo.keycloak_terraform_db_connection" .  | nindent 12 }}
+            - name: POSTGRES_SCHEMA_NAME
+              value: "terraform_remote_state_calculate_primary"
+
+            # Keycloak REST connection
+            - name: TF_VAR_admin_password
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "os2mo.keycloak_admin_secret" . }}
+                  key: admin_password
+
+            # Configuration of the client
+            - name: TF_VAR_client_name
+              value: "{{ $keycloak_client_id }}"
+            - name: TF_VAR_client_roles
+              value: '["admin"]'
+            - name: TF_VAR_client_secret
+              valueFrom:
+                secretKeyRef:
+                  name: calculate-primary-client-secret
+                  key: client_secret
+          resources:
+            {{- toYaml .Values.initContainers.resources | nindent 12 }}
+        {{ include "os2mo.wait-for-mo" . | nindent 8 }}
+        - name: os2mo-init
+          image: "{{ .Values.os2mo.init.image.registry }}/{{ .Values.os2mo.init.image.repository }}:{{ .Values.os2mo.init.image.tag }}"
+          imagePullPolicy: {{ .Values.os2mo.init.image.pullPolicy }}
+          env:
+            - name: AUTH_SERVER
+              value: "http://keycloak-service:8080/auth"
+            - name: MO_URL
+              value: "http://mo-service:5000"
+            - name: CLIENT_ID
+              value: "{{ $keycloak_client_id }}"
+            - name: CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: calculate-primary-client-secret
+                  key: client_secret
+            - name: LORA_URL
+              value: "http://mo-service:8080/lora"
+          resources:
+            {{- toYaml .Values.initContainers.resources | nindent 12 }}
+{{- end }}

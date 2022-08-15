@@ -487,3 +487,20 @@ manager_engagement_elevator:
 # * `secret`, a name of a secret that must contain the key "client_secret"
 # * `roles`, RBAC roles for the integration builder, e.g. '["admin"]'
 externalIntegrations: []
+
+calculate_primary:
+  enabled: false
+  image:
+    registry: docker.io
+    repository: magentaaps/os2mo-amqp-trigger-calculate-primary
+    tag: "0.2.0"
+    pullPolicy: IfNotPresent
+  integration: "DEFAULT"
+  amqp_host: ""
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "100m"
+    limits:
+      memory: "1024Mi"
+      cpu: "250m"
