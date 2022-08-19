@@ -1,0 +1,20 @@
+# SPDX-FileCopyrightText: Magenta ApS
+#
+# SPDX-License-Identifier: MPL-2.0
+---
+{{- if .Values.adguid_sync.enabled }}
+{{- if .Values.metrics.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: adguid_sync
+  labels:
+    app: adguid_sync
+spec:
+  selector:
+    matchLabels:
+      app: adguid_sync
+  endpoints:
+  - port: "8000"
+{{- end }}
+{{- end }}

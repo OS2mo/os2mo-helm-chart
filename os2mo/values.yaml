@@ -421,3 +421,34 @@ orggatekeeper:
       periodSeconds: 10
       timeoutSeconds: 1
       failureThreshold: 3
+
+
+adguid_sync:
+  enabled: false
+  image:
+    registry: docker.io
+    repository: magentaaps/os2mo-amqp-trigger-adguid-sync
+    tag: latest
+    pullPolicy: IfNotPresent
+  # ad_controllers: '[]'
+  environment: {}
+  environment_containing_json: {}
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "100m"
+    limits:
+      memory: "1024Mi"
+      cpu: "250m"
+  probes:
+    startupProbe:
+      failureThreshold: 150
+      periodSeconds: 2
+    liveness:
+      periodSeconds: 10
+      timeoutSeconds: 1
+      failureThreshold: 3
+    readiness:
+      periodSeconds: 10
+      timeoutSeconds: 1
+      failureThreshold: 3
