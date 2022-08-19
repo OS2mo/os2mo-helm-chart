@@ -15,6 +15,6 @@ metadata:
   {{- end }}
 data:
   config: |
-    itsystems:
+    it_systems:
       ADGUID: "Active Directory GUID"
 {{- end }}
