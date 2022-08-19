@@ -1,0 +1,20 @@
+# SPDX-FileCopyrightText: Magenta ApS
+#
+# SPDX-License-Identifier: MPL-2.0
+---
+{{- if .Values.adguid_sync.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: adguid-sync-init-config
+  labels:
+    app: adguid_sync
+  {{- with .Values.annotations }}
+  annotations:
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+data:
+  config: |
+    itsystems:
+      ADGUID: "Active Directory GUID"
+{{- end }}

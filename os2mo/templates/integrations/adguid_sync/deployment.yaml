@@ -124,5 +124,43 @@ spec:
                 secretKeyRef:
                   name: adguid-sync-client-secret
                   key: client_secret
+        {{ include "os2mo.wait-for-mox" . | nindent 8 }}
         {{ include "os2mo.wait-for-mo" . | nindent 8 }}
+        - name: os2mo-init
+          image: "{{ .Values.os2mo.init.image.registry }}/{{ .Values.os2mo.init.image.repository }}:{{ .Values.os2mo.init.image.tag }}"
+          imagePullPolicy: {{ .Values.os2mo.init.image.pullPolicy }}
+          env:
+            - name: AUTH_SERVER
+              value: "http://keycloak-service:8080/auth"
+            - name: MO_URL
+              value: "http://mo-service:5000"
+            - name: CLIENT_ID
+              value: "{{ $keycloak_client_id }}"
+            - name: CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: adguid-sync-client-secret
+                  key: client_secret
+            - name: LORA_URL
+              value: "http://mox-service:8080"
+            - name: LORA_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: keycloak-lora-dipex-secret
+                  key: client_secret
+            - name: LORA_AUTH_REALM
+              value: "lora"
+          resources:
+            {{- toYaml .Values.initContainers.resources | nindent 12 }}
+          volumeMounts:
+           - name: adguid-sync-init-config-volume
+             mountPath: /config
+             readOnly: true
+      volumes:
+        - name: adguid-sync-init-config-volume
+          configMap:
+            name: adguid-sync-init-config
+            items:
+              - key: config
+                path: config.yml
 {{- end }}
