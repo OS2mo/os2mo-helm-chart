@@ -1,0 +1,168 @@
+# SPDX-FileCopyrightText: Magenta ApS
+#
+# SPDX-License-Identifier: MPL-2.0
+---
+{{- if .Values.ad_to_mo_sync.enabled }}
+{{- $keycloak_client_id := "integration_ad_to_mo_sync" }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ad-to-mo-sync
+  labels:
+    app: ad-to-mo-sync
+  {{- with .Values.annotations }}
+  annotations:
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  selector:
+    matchLabels:
+      app: ad-to-mo-sync
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: ad-to-mo-sync
+    spec:
+      containers:
+        - name: ad-to-mo-sync
+          image: "{{ .Values.ad_to_mo_sync.image.registry }}/{{ .Values.ad_to_mo_sync.image.repository }}:{{ .Values.ad_to_mo_sync.image.tag }}"
+          imagePullPolicy: {{ .Values.ad_to_mo_sync.image.pullPolicy }}
+          env:
+            - name: AMQP_HOST
+              value: "{{ .Values.ad_to_mo_sync.amqp_host }}"
+            - name: AMQP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ad-to-mo-sync-secret
+                  key: amqp_password
+            - name: MO_URL
+              value: "http://mo-service:5000"
+            - name: AUTH_SERVER
+              value: "http://keycloak-service:8080/auth"
+            - name: AUTH_REALM
+              value: "mo"
+            - name: CLIENT_ID
+              value: "{{ $keycloak_client_id }}"
+            - name: CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: ad-to-mo-sync-client-secret
+                  key: client_secret
+            - name: AD_CONTROLLERS
+              # The piping to "quote" could give problem as we have seen before with JSON envs
+              # If so, use this uncommented line instead and set a default value in values.yaml to '[]'
+              # value: "{{ .Values.ad_to_mo_sync.ad_controllers }}"
+              value: {{ required "AD_CONTROLLERS must be set" .Values.ad_to_mo_sync.ad_controllers | quote }}
+            - name: AD_DOMAIN
+              value: {{ required "AD_DOMAIN must be set" .Values.ad_to_mo_sync.ad_domain | quote }}
+            - name: AD_USER
+              value: {{ required "AD_USER must be set" .Values.ad_to_mo_sync.ad_user | quote }}
+            - name: AD_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ad-to-mo-sync-secret
+                  key: ad_password
+            - name: AD_CPR_ATTRIBUTE
+              value: {{ required "AD_CPR_ATTRIBUTE must be set" .Values.ad_to_mo_sync.ad_cpr_attribute | quote }}
+            - name: AD_SEARCH_BASE
+              value: {{ required "AD_SEARCH_BASE must be set" .Values.ad_to_mo_sync.ad_search_base | quote }}
+            - name: AD_MAPPINGS
+              value: {{ required "AD_MAPPINGS must be set" .Values.ad_to_mo_sync.ad_mappings | quote }}
+          envFrom:
+            - configMapRef:
+                name: ad-to-mo-sync-config
+            - configMapRef:
+                name: ad-to-mo-sync-json-config
+          ports:
+            - containerPort: 8000
+          resources:
+            {{- toYaml .Values.ad_to_mo_sync.resources | nindent 12 }}
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: 8000
+            periodSeconds: {{ .Values.ad_to_mo_sync.probes.liveness.periodSeconds }}
+            timeoutSeconds: {{ .Values.ad_to_mo_sync.probes.liveness.timeoutSeconds }}
+            failureThreshold: {{ .Values.ad_to_mo_sync.probes.liveness.failureThreshold }}
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: 8000
+            periodSeconds: {{ .Values.ad_to_mo_sync.probes.readiness.periodSeconds }}
+            timeoutSeconds: {{ .Values.ad_to_mo_sync.probes.readiness.timeoutSeconds }}
+            failureThreshold: {{ .Values.ad_to_mo_sync.probes.readiness.failureThreshold }}
+          startupProbe:
+            httpGet:
+              path: /health/ready
+              port: 8000
+            failureThreshold: {{ .Values.ad_to_mo_sync.probes.startupProbe.failureThreshold }}
+            periodSeconds: {{ .Values.ad_to_mo_sync.probes.startupProbe.periodSeconds }}
+      initContainers:
+        {{ include "os2mo.wait-for-keycloak" . | nindent 8 }}
+        - name: create-client-secret
+          image: "{{ .Values.keycloak.integrationbuilder.image.registry }}/{{ .Values.keycloak.integrationbuilder.image.repository }}:{{ .Values.keycloak.integrationbuilder.image.tag }}"
+          imagePullPolicy: {{ .Values.keycloak.integrationbuilder.image.pullPolicy }}
+          env:
+            {{ include "os2mo.keycloak_terraform_db_connection" .  | nindent 12 }}
+            - name: POSTGRES_SCHEMA_NAME
+              value: terraform_remote_state_ad_to_mo_sync
+
+            # Keycloak REST connection
+            - name: TF_VAR_admin_password
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "os2mo.keycloak_admin_secret" . }}
+                  key: admin_password
+
+            # Configuration of the client
+            - name: TF_VAR_client_name
+              value: "{{ $keycloak_client_id }}"
+            - name: TF_VAR_client_roles
+              value: '["admin"]'
+            - name: TF_VAR_client_secret
+              valueFrom:
+                secretKeyRef:
+                  name: ad-to-mo-sync-client-secret
+                  key: client_secret
+        {{ include "os2mo.wait-for-mox" . | nindent 8 }}
+        {{ include "os2mo.wait-for-mo" . | nindent 8 }}
+        - name: os2mo-init
+          image: "{{ .Values.os2mo.init.image.registry }}/{{ .Values.os2mo.init.image.repository }}:{{ .Values.os2mo.init.image.tag }}"
+          imagePullPolicy: {{ .Values.os2mo.init.image.pullPolicy }}
+          env:
+            - name: AUTH_SERVER
+              value: "http://keycloak-service:8080/auth"
+            - name: MO_URL
+              value: "http://mo-service:5000"
+            - name: CLIENT_ID
+              value: "{{ $keycloak_client_id }}"
+            - name: CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: ad-to-mo-sync-client-secret
+                  key: client_secret
+            - name: LORA_URL
+              value: "http://mox-service:8080"
+            - name: LORA_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: keycloak-lora-dipex-secret
+                  key: client_secret
+            - name: LORA_AUTH_REALM
+              value: "lora"
+          resources:
+            {{- toYaml .Values.initContainers.resources | nindent 12 }}
+          volumeMounts:
+           - name: ad-to-mo-sync-init-config-volume
+             mountPath: /config
+             readOnly: true
+      volumes:
+        - name: ad-to-mo-sync-init-config-volume
+          configMap:
+            name: ad-to-mo-sync-init-config
+            items:
+              - key: config
+                path: config.yml
+{{- end }}

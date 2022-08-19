@@ -1,0 +1,20 @@
+# SPDX-FileCopyrightText: Magenta ApS
+#
+# SPDX-License-Identifier: MPL-2.0
+---
+{{- if .Values.ad_to_mo_sync.enabled }}
+{{- if .Values.metrics.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: ad-to-mo-sync
+  labels:
+    app: ad-to-mo-sync
+spec:
+  selector:
+    matchLabels:
+      app: ad-to-mo-sync
+  endpoints:
+  - port: "8000"
+{{- end }}
+{{- end }}
