@@ -7,9 +7,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: adguid_sync
+  name: adguid-sync
   labels:
-    app: adguid_sync
+    app: adguid-sync
   {{- with .Values.annotations }}
   annotations:
   {{- toYaml . | nindent 4 }}
@@ -17,16 +17,16 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: adguid_sync
+      app: adguid-sync
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        app: adguid_sync
+        app: adguid-sync
     spec:
       containers:
-        - name: adguid_sync
+        - name: adguid-sync
           image: "{{ .Values.adguid_sync.image.registry }}/{{ .Values.adguid_sync.image.repository }}:{{ .Values.adguid_sync.image.tag }}"
           imagePullPolicy: {{ .Values.adguid_sync.image.pullPolicy }}
           env:

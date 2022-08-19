@@ -8,14 +8,14 @@ kind: Service
 metadata:
   name: adguid-sync-service
   labels:
-    app: adguid_sync
+    app: adguid-sync
   {{- with .Values.annotations }}
   annotations:
   {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
   selector:
-    app: adguid_sync
+    app: adguid-sync
   ports:
     - name: "8000"
       port: 8000

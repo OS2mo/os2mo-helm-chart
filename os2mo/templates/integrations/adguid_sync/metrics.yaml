@@ -7,13 +7,13 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: adguid_sync
+  name: adguid-sync
   labels:
-    app: adguid_sync
+    app: adguid-sync
 spec:
   selector:
     matchLabels:
-      app: adguid_sync
+      app: adguid-sync
   endpoints:
   - port: "8000"
 {{- end }}

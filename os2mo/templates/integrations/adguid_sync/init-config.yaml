@@ -8,7 +8,7 @@ kind: ConfigMap
 metadata:
   name: adguid-sync-init-config
   labels:
-    app: adguid_sync
+    app: adguid-sync
   {{- with .Values.annotations }}
   annotations:
   {{- toYaml . | nindent 4 }}
