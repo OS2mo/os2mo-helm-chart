@@ -30,13 +30,21 @@ spec:
           image: "{{ .Values.adguid_sync.image.registry }}/{{ .Values.adguid_sync.image.repository }}:{{ .Values.adguid_sync.image.tag }}"
           imagePullPolicy: {{ .Values.adguid_sync.image.pullPolicy }}
           env:
+            - name: AMQP_SCHEME
+              value: {{ .Values.adguid_sync.amqp_scheme | default "amqps" | quote }}
             - name: AMQP_HOST
               value: "{{ .Values.adguid_sync.amqp_host }}"
+            - name: AMQP_USER
+              value: "{{ .Values.adguid_sync.amqp_user }}"
             - name: AMQP_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: adguid-sync-amqp-secret
+                  name: adguid-sync-secret
                   key: amqp_password
+            - name: AMQP_PORT
+              value: {{ .Values.adguid_sync.amqp_port | default "5672" | quote }}
+            - name: AMQP_VHOST
+              value: "{{ .Values.adguid_sync.amqp_vhost }}"
             - name: MO_URL
               value: "http://mo-service:5000"
             - name: AUTH_SERVER
@@ -62,7 +70,7 @@ spec:
             - name: AD_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: adguid-sync-amqp-secret
+                  name: adguid-sync-secret
                   key: ad_password
             - name: AD_CPR_ATTRIBUTE
               value: {{ required "AD_CPR_ATTRIBUTE must be set" .Values.adguid_sync.ad_cpr_attribute | quote }}
