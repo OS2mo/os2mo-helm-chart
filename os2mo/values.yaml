@@ -473,7 +473,8 @@ ad_to_mo_sync:
     repository: magentaaps/os2mo-amqp-trigger-ad-to-mo-sync
     tag: latest
     pullPolicy: IfNotPresent
-  # ad_controllers: '[]'
+  amqp_scheme: null
+  amqp_port: null
   environment: {}
   environment_containing_json: {}
   resources:
