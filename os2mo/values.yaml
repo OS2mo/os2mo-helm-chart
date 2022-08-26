@@ -430,7 +430,8 @@ adguid_sync:
     repository: magentaaps/os2mo-amqp-trigger-adguid-sync
     tag: latest
     pullPolicy: IfNotPresent
-  # ad_controllers: '[]'
+  amqp_scheme: null
+  amqp_port: null
   environment: {}
   environment_containing_json: {}
   resources:

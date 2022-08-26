@@ -30,8 +30,10 @@ spec:
           image: "{{ .Values.adguid_sync.image.registry }}/{{ .Values.adguid_sync.image.repository }}:{{ .Values.adguid_sync.image.tag }}"
           imagePullPolicy: {{ .Values.adguid_sync.image.pullPolicy }}
           env:
+            {{- if .Values.adguid_sync.amqp_scheme }}
             - name: AMQP_SCHEME
-              value: {{ .Values.adguid_sync.amqp_scheme | default "amqps" | quote }}
+              value: "{{ .Values.adguid_sync.amqp_scheme }}"
+            {{- end }}
             - name: AMQP_HOST
               value: "{{ .Values.adguid_sync.amqp_host }}"
             - name: AMQP_USER
@@ -41,8 +43,10 @@ spec:
                 secretKeyRef:
                   name: adguid-sync-secret
                   key: amqp_password
+            {{- if .Values.adguid_sync.amqp_port }}
             - name: AMQP_PORT
-              value: {{ .Values.adguid_sync.amqp_port | default "5672" | quote }}
+              value: "{{ .Values.adguid_sync.amqp_port }}"
+            {{- end }}
             - name: AMQP_VHOST
               value: "{{ .Values.adguid_sync.amqp_vhost }}"
             - name: MO_URL
