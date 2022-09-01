@@ -98,11 +98,12 @@ spec:
 
             - name: CONFDB_SHOW_ORG_UNIT_BUTTON
               value: {{ .Values.sdtool.enabled | quote }}
+
           envFrom:
-{{ if .Values.os2mo.external_env_config_map_name }}
+          {{- if .Values.os2mo.external_env_config_map_name }}
           - configMapRef:
               name: "{{ .Values.os2mo.external_env_config_map_name }}"
-{{ end }}
+          {{- end }}
           - configMapRef:
               name: mo-config
           - configMapRef:
