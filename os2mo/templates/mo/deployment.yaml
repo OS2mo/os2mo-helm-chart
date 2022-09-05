@@ -111,9 +111,6 @@ spec:
 
           ports:
             - containerPort: 5000
-          volumeMounts:
-            - mountPath: "/queries"
-              name: queries-pv-storage
           resources:
             {{- toYaml .Values.os2mo.resources | nindent 12 }}
           {{- if .Values.os2mo.probes.enabled }}
@@ -144,8 +141,4 @@ spec:
         {{- if .Values.sdtool.enabled }}
         {{ include "os2mo.wait-for-sdtool" . | nindent 8 }}
         {{- end }}
-      volumes:
-        - name: queries-pv-storage
-          persistentVolumeClaim:
-            claimName: mo-queries-pv-claim
       restartPolicy: Always
