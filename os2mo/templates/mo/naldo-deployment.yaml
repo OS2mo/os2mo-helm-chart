@@ -1,0 +1,39 @@
+# SPDX-FileCopyrightText: Magenta ApS
+#
+# SPDX-License-Identifier: MPL-2.0
+---
+{{ if not .Values.os2mo.headless }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mo-naldo-deployment
+  labels:
+    app: mo-naldo
+  {{- with .Values.annotations }}
+  annotations:
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  selector:
+    matchLabels:
+      app: mo-naldo
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: mo-naldo
+    spec:
+      containers:
+        - name: mo-naldo
+          image: "{{ .Values.os2mo.naldo.image.registry }}/{{ .Values.os2mo.naldo.image.repository }}:{{ .Values.os2mo.naldo.image.tag }}"
+          imagePullPolicy: {{ .Values.os2mo.naldo.image.pullPolicy }}
+          env:
+            - name: PUBLIC_BASE_URL
+              value: "https://{{ .Values.ingress.hostname }}"
+          ports:
+            - containerPort: 3000
+          resources:
+            {{- toYaml .Values.os2mo.naldo.resources | nindent 12 }}
+      restartPolicy: Always
+{{ end }}
