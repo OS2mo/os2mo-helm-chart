@@ -27,6 +27,8 @@ wait_for_service:
 amqp:
   enabled: false
   url_secret: null
+  amqp_scheme: null
+  amqp_port: null
 
 os2mo:
   replicaCount: 1
@@ -441,8 +443,6 @@ adguid_sync:
     repository: magentaaps/os2mo-amqp-trigger-adguid-sync
     tag: latest
     pullPolicy: IfNotPresent
-  amqp_scheme: null
-  amqp_port: null
   environment: {}
   environment_containing_json: {}
   resources:
@@ -473,8 +473,6 @@ ad_to_mo_sync:
     repository: magentaaps/os2mo-amqp-trigger-ad-to-mo-sync
     tag: latest
     pullPolicy: IfNotPresent
-  amqp_scheme: null
-  amqp_port: null
   environment: {}
   environment_containing_json: {}
   resources:
