@@ -41,7 +41,7 @@ spec:
             - name: AMQP_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: adguid-sync-secret
+                  name: amqp-secret
                   key: amqp_password
             {{- if .Values.amqp.amqp_port }}
             - name: AMQP_PORT
