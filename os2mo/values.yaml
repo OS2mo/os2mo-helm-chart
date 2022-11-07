@@ -297,8 +297,8 @@ sd_changed_at:
       memory: "256Mi"
       cpu: "100m"
     limits:
-      memory: "512Mi"
-      cpu: "500m"
+      memory: "1024Mi"
+      cpu: "1000m"
 
 sdtool:
   enabled: false
