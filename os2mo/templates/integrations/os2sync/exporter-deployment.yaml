@@ -48,7 +48,7 @@ spec:
             - name: os2sync_top_unit_uuid
               value: {{ required "The top level uuid is missing" .Values.os2sync.os2sync_top_unit_uuid | quote }}
             - name: os2sync_api_url
-              value: "http://os2sync-service:5000/api/"
+              value: {{ .Values.os2sync.api_url | default "http://os2sync-service:5000/api" | quote }}
             - name: os2sync_log_level
               value: {{ .Values.os2sync.os2sync_log_level | default 20 | quote }}
             - name: os2sync_log_file
