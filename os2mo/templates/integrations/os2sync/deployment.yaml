@@ -63,9 +63,12 @@ spec:
                   key: db_password
             - name: DBConnectionString
               value: "server=$(DB_HOST);user id=$(DB_USERNAME);password=$(DB_PASSWORD);database=$(DB_NAME);persistsecurityinfo=True;port=3306;"
-            {{ if and .Values.sentry.dsn .Values.sentry.environment }}
+            {{ if .Values.sentry.environment }}
             - name: SENTRY_DSN
-              value: {{ .Values.sentry.dsn | quote }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.sentry.secret | quote }}
+                  key: dsn
             - name: SENTRY_ENVIRONMENT
               value: {{ .Values.sentry.environment | quote }}
             {{ end }}

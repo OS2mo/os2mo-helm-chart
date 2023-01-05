@@ -30,9 +30,12 @@ spec:
           image: "{{ .Values.adguid_sync.image.registry }}/{{ .Values.adguid_sync.image.repository }}:{{ .Values.adguid_sync.image.tag }}"
           imagePullPolicy: {{ .Values.adguid_sync.image.pullPolicy }}
           env:
-            {{ if and .Values.sentry.dsn .Values.sentry.environment }}
+            {{ if .Values.sentry.environment }}
             - name: SENTRY_DSN
-              value: {{ .Values.sentry.dsn | quote }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.sentry.secret | quote }}
+                  key: dsn
             - name: SENTRY_ENVIRONMENT
               value: {{ .Values.sentry.environment | quote }}
             {{ end }}

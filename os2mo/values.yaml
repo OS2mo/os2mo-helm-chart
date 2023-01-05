@@ -9,9 +9,11 @@ annotations:
 metrics:
   enabled: false
 
-# Optional. If configured, *both* `dsn` and `environment` are required.
+# Optional Sentry support.
+# To enable, set the environment (e.g. os2mo.silkeborg.prod) and create a
+# secret "sentry-dsn-secret" with the "dsn" key.
 sentry:
-  dsn: null
+  secret: "sentry-dsn-secret"
   environment: null
 
 ingress:

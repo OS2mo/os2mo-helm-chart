@@ -30,9 +30,12 @@ spec:
           image: "{{ .Values.sdtool.image.registry }}/{{ .Values.sdtool.image.repository }}:{{ .Values.sdtool.image.tag }}"
           imagePullPolicy: {{ .Values.sdtool.image.pullPolicy }}
           env:
-            {{ if and .Values.sentry.dsn .Values.sentry.environment }}
+            {{ if .Values.sentry.environment }}
             - name: SENTRY_DSN
-              value: {{ .Values.sentry.dsn | quote }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.sentry.secret | quote }}
+                  key: dsn
             - name: SENTRY_ENVIRONMENT
               value: {{ .Values.sentry.environment | quote }}
             {{ end }}
