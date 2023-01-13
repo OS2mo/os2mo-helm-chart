@@ -3,8 +3,7 @@
 # SPDX-License-Identifier: MPL-2.0
 ---
 {{- if and (.Values.sd_changed_at.enabled) (.Values.sd_changed_at.cronjob_enabled) }}
-# v1beta1 necessary for Kubernetes versions < 1.21
-apiVersion: {{ ternary "batch/v1beta1" "batch/v1" (.Capabilities.APIVersions.Has "batch/v1beta1/CronJob") }}
+apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: cronjob-sd-changed-at
