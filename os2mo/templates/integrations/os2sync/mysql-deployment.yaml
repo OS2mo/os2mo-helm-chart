@@ -1,0 +1,54 @@
+# SPDX-FileCopyrightText: Magenta ApS
+#
+# SPDX-License-Identifier: MPL-2.0
+---
+{{- if and .Values.os2sync.enabled .Values.os2sync.mysql_deploy }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: os2sync-mysql
+  labels:
+    app: os2sync-mysql
+  {{- with .Values.annotations }}
+  annotations:
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  selector:
+    matchLabels:
+      app: os2sync-mysql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: os2sync-mysql
+    spec:
+      containers:
+        - name: os2sync-mysql
+          image: "mysql:{{ .Values.os2sync.mysql_version }}"
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: os2sync-secret
+                  key: db_root_password
+            - name: MYSQL_USER
+              value: os2sync_admin
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: os2sync-secret
+                  key: db_password
+            - name: MYSQL_DATABASE
+              value: os2sync
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+            - name: os2sync-mysql
+              mountPath: /var/lib/mysql
+      volumes:
+        - name: os2sync-mysql-pv
+          persistentVolumeClaim:
+            claimName: os2sync-mysql-pvc
+{{- end }}

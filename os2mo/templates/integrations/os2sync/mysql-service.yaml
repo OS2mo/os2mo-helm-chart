@@ -1,0 +1,23 @@
+# SPDX-FileCopyrightText: Magenta ApS
+#
+# SPDX-License-Identifier: MPL-2.0
+---
+{{- if and .Values.os2sync.enabled .Values.os2sync.mysql_deploy }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: os2sync-mysql-service
+  labels:
+    app: os2sync-mysql
+  {{- with .Values.annotations }}
+  annotations:
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  selector:
+    app: os2sync-mysql
+  ports:
+    - name: "3306"
+      port: 3306
+      targetPort: 3306
+{{- end }}
