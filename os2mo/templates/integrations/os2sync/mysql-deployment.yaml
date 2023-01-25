@@ -28,11 +28,8 @@ spec:
         - name: os2sync-mysql
           image: "mysql:{{ .Values.os2sync.mysql_version }}"
           env:
-            - name: MYSQL_ROOT_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: os2sync-secret
-                  key: db_root_password
+            - name: MYSQL_RANDOM_ROOT_PASSWORD
+              value: "yes"
             - name: MYSQL_USER
               value: os2sync_admin
             - name: MYSQL_PASSWORD
