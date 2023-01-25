@@ -382,7 +382,7 @@ os2sync:
   # Set this to the municipality CVR
   municipality: null
   mysql_version: 8.0.29
-  mysql_deploy: false
+  mysql_deploy: true
   db_host: null
   db_name: os2sync
   db_username: os2sync_admin
