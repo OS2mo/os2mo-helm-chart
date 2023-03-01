@@ -1,0 +1,16 @@
+# SPDX-FileCopyrightText: Magenta ApS
+#
+# SPDX-License-Identifier: MPL-2.0
+---
+{{- if .Values.manager_engagement_elevator.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: manager-engagement-elevator-config
+  {{- with .Values.annotations }}
+  annotations:
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+data:
+{{ toYaml .Values.manager_engagement_elevator.environment | indent 2 }}
+{{- end }}

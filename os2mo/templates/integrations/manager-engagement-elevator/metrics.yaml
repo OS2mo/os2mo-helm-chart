@@ -1,0 +1,20 @@
+# SPDX-FileCopyrightText: Magenta ApS
+#
+# SPDX-License-Identifier: MPL-2.0
+---
+{{- if .Values.manager_engagement_elevator.enabled }}
+{{- if .Values.metrics.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: manager-engagement-elevator
+  labels:
+    app: manager-engagement-elevator
+spec:
+  selector:
+    matchLabels:
+      app: manager-engagement-elevator
+  endpoints:
+  - port: "8000"
+{{- end }}
+{{- end }}

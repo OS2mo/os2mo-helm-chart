@@ -483,3 +483,19 @@ sql_export:
     limits:
       memory: "1024Mi"
       cpu: "1000m"
+
+manager_engagement_elevator:
+  enabled: false
+  image:
+    registry: docker.io
+    repository: magentaaps/os2mo-manager-elevator
+    tag: latest
+    pullPolicy: IfNotPresent
+  environment: {}
+  resources:
+    requests:
+      memory: "512Mi"
+      cpu: "250m"
+    limits:
+      memory: "1024Mi"
+      cpu: "1000m"

@@ -1,0 +1,23 @@
+# SPDX-FileCopyrightText: Magenta ApS
+#
+# SPDX-License-Identifier: MPL-2.0
+---
+{{- if .Values.manager_engagement_elevator.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: manager-engagement-elevator-service
+  labels:
+    app: manager-engagement-elevator
+  {{- with .Values.annotations }}
+  annotations:
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  selector:
+    app: manager-engagement-elevator
+  ports:
+    - name: "8000"
+      port: 8000
+      targetPort: 8000
+{{- end }}

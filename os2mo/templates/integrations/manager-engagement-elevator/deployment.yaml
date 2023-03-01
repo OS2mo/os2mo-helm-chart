@@ -1,0 +1,93 @@
+# SPDX-FileCopyrightText: Magenta ApS
+#
+# SPDX-License-Identifier: MPL-2.0
+---
+{{- if .Values.manager_engagement_elevator.enabled }}
+{{- $keycloak_client_id := "integration_manager_engagement_elevator" }}
+# TODO: see https://git.magenta.dk/rammearkitektur/os2mo-helm-chart/-/merge_requests/142#note_140651
+{{- if not .Values.amqp.enabled }}
+  {{- fail "Must have AMQP enabled if manager-engagement-elevator is enabled" }}
+{{- end }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: manager-engagement-elevator
+  labels:
+    app: manager-engagement-elevator
+  {{- with .Values.annotations }}
+  annotations:
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: manager-engagement-elevator
+  template:
+    metadata:
+      labels:
+        app: manager-engagement-elevator
+    spec:
+      containers:
+        - name: manager-engagement-elevator
+          image: "{{ .Values.manager_engagement_elevator.image.registry }}/{{ .Values.manager_engagement_elevator.image.repository }}:{{ .Values.manager_engagement_elevator.image.tag }}"
+          imagePullPolicy: {{ .Values.manager_engagement_elevator.image.pullPolicy }}
+          env:
+            - name: FASTRAMQPI__CLIENT_ID
+              value: "{{ $keycloak_client_id }}"
+            - name: FASTRAMQPI__CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: manager-engagement-elevator-client-secret
+                  key: client_secret
+            - name: FASTRAMQPI__AMQP__URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.amqp.url_secret }}
+                  key: url
+            {{ if .Values.sentry.environment }}
+            - name: SENTRY_DSN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.sentry.secret }}
+                  key: dsn
+            - name: SENTRY_ENVIRONMENT
+              value: {{ .Values.sentry.environment | quote }}
+            {{ end }}
+          envFrom:
+            # The configMap is capable of handling JSON ENVs
+            - configMapRef:
+                name: manager-engagement-elevator-config
+          ports:
+            - containerPort: 8000
+          resources:
+            {{- toYaml .Values.manager_engagement_elevator.resources | nindent 12 }}
+      initContainers:
+        {{ include "os2mo.wait-for-keycloak" . | nindent 8 }}
+        - name: create-client-secret
+          image: "{{ .Values.keycloak.integrationbuilder.image.registry }}/{{ .Values.keycloak.integrationbuilder.image.repository }}:{{ .Values.keycloak.integrationbuilder.image.tag }}"
+          imagePullPolicy: {{ .Values.keycloak.integrationbuilder.image.pullPolicy }}
+          env:
+            {{ include "os2mo.keycloak_terraform_db_connection" .  | nindent 12 }}
+            - name: POSTGRES_SCHEMA_NAME
+              value: terraform_remote_state_manager_engagement_elevator
+
+            # Keycloak REST connection
+            - name: TF_VAR_admin_password
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "os2mo.keycloak_admin_secret" . }}
+                  key: admin_password
+
+            # Configuration of the client
+            - name: TF_VAR_client_name
+              value: "{{ $keycloak_client_id }}"
+            - name: TF_VAR_client_roles
+              value: '["admin"]'
+            - name: TF_VAR_client_secret
+              valueFrom:
+                secretKeyRef:
+                  name: manager-engagement-elevator-client-secret
+                  key: client_secret
+        {{ include "os2mo.wait-for-mo" . | nindent 8 }}
+{{- end }}
