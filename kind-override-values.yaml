@@ -2,6 +2,21 @@
 #
 # SPDX-License-Identifier: MPL-2.0
 ---
+# These settings can be used to install a local AMQP system in the dev
+# environment. Install the Bitnami Helm repo if it is not installed already
+# (can be checked with "$ helm repo list"):
+# $ helm repo add bitnami https://charts.bitnami.com/bitnami
+# Install RabbitMQ:
+# $ helm install rabbitmq bitnami/rabbitmq
+amqp:
+  enabled: false
+  # The url_secret can be created with:
+  # $ kubectl create secret generic amqp-secret \
+  #   --from-literal=url=amqp://user:password@rabbitmq
+  # where the password can be found in the RabbitMQ secret in the cluster
+  #url_secret: amqp-secret
+  url_secret: null
+
 os2mo:
   replicaCount: 1
   init:
