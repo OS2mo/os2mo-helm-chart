@@ -15,7 +15,6 @@ amqp:
   #   --from-literal=url=amqp://user:password@rabbitmq
   # where the password can be found in the RabbitMQ secret in the cluster
   #url_secret: amqp-secret
-  url_secret: null
 
 os2mo:
   replicaCount: 1
