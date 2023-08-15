@@ -2,18 +2,17 @@
 #
 # SPDX-License-Identifier: MPL-2.0
 ---
-{{- if .Values.manager_engagement_elevator.enabled }}
-{{- $keycloak_client_id := "integration_manager_engagement_elevator" }}
-# TODO: see https://git.magenta.dk/rammearkitektur/os2mo-helm-chart/-/merge_requests/142#note_140651
+{{- if .Values.manager-terminator.enabled }}
+{{- $keycloak_client_id := "integration_manager_terminator" }}
 {{- if not .Values.amqp.enabled }}
-  {{- fail "Must have AMQP enabled if manager-engagement-elevator is enabled" }}
+  {{- fail "Must have AMQP enabled if manager-terminator is enabled" }}
 {{- end }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: manager-engagement-elevator
+  name: manager-terminator
   labels:
-    app: manager-engagement-elevator
+    app: manager-terminator
   {{- with .Values.annotations }}
   annotations:
   {{- toYaml . | nindent 4 }}
@@ -22,23 +21,23 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: manager-engagement-elevator
+      app: manager-terminator
   template:
     metadata:
       labels:
-        app: manager-engagement-elevator
+        app: manager-terminator
     spec:
       containers:
-        - name: manager-engagement-elevator
-          image: "{{ .Values.manager_engagement_elevator.image.registry }}/{{ .Values.manager_engagement_elevator.image.repository }}:{{ .Values.manager_engagement_elevator.image.tag }}"
-          imagePullPolicy: {{ .Values.manager_engagement_elevator.image.pullPolicy }}
+        - name: manager-terminator
+          image: "{{ .Values.manager_terminator.image.registry }}/{{ .Values.manager_terminator.image.repository }}:{{ .Values.manager_terminator.image.tag }}"
+          imagePullPolicy: {{ .Values.manager_terminator.image.pullPolicy }}
           env:
             - name: FASTRAMQPI__CLIENT_ID
               value: "{{ $keycloak_client_id }}"
             - name: FASTRAMQPI__CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: manager-engagement-elevator-client-secret
+                  name: manager-terminator-client-secret
                   key: client_secret
             - name: FASTRAMQPI__AMQP__URL
               valueFrom:
@@ -54,21 +53,21 @@ spec:
             - name: SENTRY_ENVIRONMENT
               value: {{ .Values.sentry.environment | quote }}
             {{ end }}
-            {{- range $name, $value := .Values.manager_engagement_elevator.environment }}
+            {{- range $name, $value := .Values.manager_terminator.environment }}
             - name: {{ $name }}
               value: {{ $value | quote }}
             {{- end }}
           ports:
-            - containerPort: 8000
+            - containerPort: 9000
           resources:
-            {{- toYaml .Values.manager_engagement_elevator.resources | nindent 12 }}
+            {{- toYaml .Values.manager_terminator.resources | nindent 12 }}
           livenessProbe:
             httpGet:
               path: /health/live
-              port: 8000
-            periodSeconds: {{ .Values.manager_engagement_elevator.probes.liveness.periodSeconds }}
-            timeoutSeconds: {{ .Values.manager_engagement_elevator.probes.liveness.timeoutSeconds }}
-            failureThreshold: {{ .Values.manager_engagement_elevator.probes.liveness.failureThreshold }}
+              port: 9000
+            periodSeconds: {{ .Values.manager_terminator.probes.liveness.periodSeconds }}
+            timeoutSeconds: {{ .Values.manager_terminator.probes.liveness.timeoutSeconds }}
+            failureThreshold: {{ .Values.manager_terminator.probes.liveness.failureThreshold }}
       initContainers:
         {{ include "os2mo.wait-for-keycloak" . | nindent 8 }}
         - name: create-client-secret
@@ -77,7 +76,7 @@ spec:
           env:
             {{ include "os2mo.keycloak_terraform_db_connection" .  | nindent 12 }}
             - name: POSTGRES_SCHEMA_NAME
-              value: terraform_remote_state_manager_engagement_elevator
+              value: terraform_remote_state_manager_terminator
 
             # Keycloak REST connection
             - name: TF_VAR_admin_password
@@ -94,7 +93,7 @@ spec:
             - name: TF_VAR_client_secret
               valueFrom:
                 secretKeyRef:
-                  name: manager-engagement-elevator-client-secret
+                  name: manager-terminator-client-secret
                   key: client_secret
         {{ include "os2mo.wait-for-mo" . | nindent 8 }}
 {{- end }}

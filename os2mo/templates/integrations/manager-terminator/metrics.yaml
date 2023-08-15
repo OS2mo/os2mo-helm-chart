@@ -2,18 +2,18 @@
 #
 # SPDX-License-Identifier: MPL-2.0
 ---
-{{- if .Values.manager_engagement_elevator.enabled }}
+{{- if .Values.manager_terminator.enabled }}
 {{- if .Values.metrics.enabled }}
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: manager-engagement-elevator
+  name: manager-terminator
   labels:
-    app: manager-engagement-elevator
+    app: manager-terminator
 spec:
   selector:
     matchLabels:
-      app: manager-engagement-elevator
+      app: manager-terminator
   endpoints:
   - port: "8000"
 {{- end }}
