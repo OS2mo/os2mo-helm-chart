@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MPL-2.0
 ---
-{{- if .Values.manager-terminator.enabled }}
+{{- if .Values.manager_terminator.enabled }}
 {{- $keycloak_client_id := "integration_manager_terminator" }}
 {{- if not .Values.amqp.enabled }}
   {{- fail "Must have AMQP enabled if manager-terminator is enabled" }}
