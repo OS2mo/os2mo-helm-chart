@@ -17,7 +17,7 @@ spec:
   selector:
     app: manager-terminator
   ports:
-    - name: "9000"
-      port: 9000
-      targetPort: 9000
+    - name: "8000"
+      port: 8000
+      targetPort: 8000
 {{- end }}
