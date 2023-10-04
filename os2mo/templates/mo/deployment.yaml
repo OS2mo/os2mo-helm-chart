@@ -108,6 +108,12 @@ spec:
             - name: CONFDB_SHOW_ORG_UNIT_BUTTON
               value: {{ .Values.sdtool.enabled | quote }}
 
+            {{ if .Values.sql_export.enabled }}
+            # SQLExport should never be audit-logged as it reads all of MO
+            - name: AUDIT_READLOG_NO_LOG_UUIDS
+              value: '["052ec901-baad-c0de-7371-6c6578706f72"]'
+            {{ end }}
+
             {{- range $name, $value := .Values.os2mo.environment }}
             - name: {{ $name }}
               value: {{ $value | quote }}
