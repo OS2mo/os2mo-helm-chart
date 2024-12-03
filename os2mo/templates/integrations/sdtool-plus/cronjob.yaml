@@ -24,7 +24,7 @@ spec:
             - name: cronjob-sdtool-plus
               image: curlimages/curl
               command: ["/bin/sh","-c"]
-              args: [ 'curl --silent --show-error --fail-with-body -X POST "http://sdtool-plus-service:8000/trigger"' ]
+              args: [ 'curl --silent --show-error --fail-with-body -X POST "http://sdtool-plus-service:8000{{ .Values.sdtool_plus.cronjob_trigger_path }}"' ]
               resources:
                 requests:
                   memory: "64Mi"
