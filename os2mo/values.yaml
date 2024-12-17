@@ -128,6 +128,14 @@ dipex:
     registry: docker.io
     repository: magentaaps/dipex
     tag: latest
+  cronjobs: {}
+    # Examples on the structure of defining a cronjob
+    # - schedule: "*/5 * * * *"
+    #   command: ["python", "--version"]
+    # - schedule: "0 * * * *"
+    #   command: 
+    #     - "python"
+    #     - "metacli.py"
   settings:
     mox.base: "http://mo-service:5000/lora"
     mora.base: "http://mo-service:5000"
