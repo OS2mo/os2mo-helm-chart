@@ -133,7 +133,7 @@ dipex:
     # - schedule: "*/5 * * * *"
     #   command: ["python", "--version"]
     # - schedule: "0 * * * *"
-    #   command: 
+    #   command:
     #     - "python"
     #     - "metacli.py"
   settings:
