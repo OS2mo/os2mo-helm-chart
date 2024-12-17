@@ -112,15 +112,3 @@ fkk:
     - name: FKK__AUTHORITY_CONTEXT_CVR
       value: "25052943"  # Magenta Aps CVR
 
-dipex:
-  cronjobs:
-    - schedule: "*/5 * * * *"
-      command: ["python", "--version"]
-    - schedule: "0 * * * *"
-      command: 
-        - "python"
-        - "metacli.py"
-    - schedule: "*/3 */2 * * *"
-      command: 
-        - "ls"
-        - "-l"
