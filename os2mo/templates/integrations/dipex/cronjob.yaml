@@ -23,6 +23,16 @@ spec:
           containers:
             - name: cronjob-dipex-{{ $i }}
               image: "{{ $.Values.dipex.image.registry }}/{{ $.Values.dipex.image.repository }}:{{ $.Values.dipex.image.tag }}"
+              env:
+              - name: CLIENT_ID
+                value: "dipex"
+              - name: CLIENT_SECRET
+                valueFrom:
+                  secretKeyRef:
+                    name: keycloak-dipex-secret
+                    key: client_secret
+              - name: AUTH_SERVER
+                value: "http://keycloak-service:8080/auth"
               command: 
               {{- range  $job.command }}
                 -  {{ . | quote}}
