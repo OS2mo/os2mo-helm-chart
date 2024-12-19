@@ -101,6 +101,15 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.sd_changed_at.sd_secret_name }}
                   key: app_dbpassword
+          {{- if .Values.sd_changed_at.number_of_days_to_persist_logs_to_files }}
+            - name: LOG_TO_FILE
+              value: "true"
+            - name: LOG_FILE_BACKUP_COUNT
+              value: {{ .Values.sd_changed_at.number_of_days_to_persist_logs_to_files }}
+          volumeMounts:
+            - name: sd-pv
+              mountPath: /var/log/sdlon
+          {{- end }}
           ports:
             - containerPort: 5000
           resources:
@@ -166,4 +175,10 @@ spec:
                   key: app_dbpassword
           resources:
             {{- toYaml .Values.initContainers.resources | nindent 12 }}
+        {{- if .Values.sd_changed_at.number_of_days_to_persist_logs_to_files }}
+        - name: sd-pv
+          # PVC must be provided via Flux Kustomization
+          persistentVolumeClaim:
+            claimName: sd-pvc
+        {{- end }}
 {{- end }}
