@@ -175,10 +175,11 @@ spec:
                   key: app_dbpassword
           resources:
             {{- toYaml .Values.initContainers.resources | nindent 12 }}
-        {{- if .Values.sd_changed_at.number_of_days_to_persist_logs_to_files }}
+      {{- if .Values.sd_changed_at.number_of_days_to_persist_logs_to_files }}
+      volumes:
         - name: sd-pv
           # PVC must be provided via Flux Kustomization
           persistentVolumeClaim:
             claimName: sd-pvc
-        {{- end }}
+      {{- end }}
 {{- end }}
