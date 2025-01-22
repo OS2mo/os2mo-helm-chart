@@ -1,0 +1,43 @@
+# SPDX-FileCopyrightText: Magenta ApS
+#
+# SPDX-License-Identifier: MPL-2.0
+{{- range $i, $job := $.Values.dipex.cronjobs }}
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cronjob-dipex-{{ $i }}
+  labels:
+    app: dipex-job
+  {{- with $.Values.annotations }}
+  annotations:
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  schedule: {{ $job.schedule | quote }}
+  timeZone: {{ $.Values.timezone | quote }}
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: cronjob-dipex-{{ $i }}
+              image: "{{ $.Values.dipex.image.registry }}/{{ $.Values.dipex.image.repository }}:{{ $.Values.dipex.image.tag }}"
+              env:
+              - name: CLIENT_ID
+                value: "dipex"
+              - name: CLIENT_SECRET
+                valueFrom:
+                  secretKeyRef:
+                    name: keycloak-dipex-secret
+                    key: client_secret
+              - name: AUTH_SERVER
+                value: "http://keycloak-service:8080/auth"
+              command: 
+              {{- range  $job.command }}
+                -  {{ . | quote}}
+              {{- end }}
+              resources:
+                {{- toYaml $.Values.dipex.resources | nindent 16 }}
+          restartPolicy: Never
+{{- end }}
