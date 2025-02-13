@@ -12,5 +12,10 @@ spec:
     matchLabels:
       app: mo
   endpoints:
-  - port: "5000"
+    - port: "5000"
+      metricRelabelings:
+        - action: keep
+          regex: "placeholder"
+          sourceLabels:
+            - __name__
 {{- end }}
