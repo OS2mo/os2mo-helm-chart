@@ -15,6 +15,11 @@ spec:
     matchLabels:
       app: sdtool-plus
   endpoints:
-  - port: "8000"
+    - port: "8000"
+      metricRelabelings:
+        - action: keep
+          regex: "amqp_publish_last_published|amqp_publish|amqp_publish_exceptions|amqp_publish_inprogress|amqp_publish_seconds|dipex_last_success_timestamp"
+          sourceLabels:
+            - __name__
 {{- end }}
 {{- end }}
