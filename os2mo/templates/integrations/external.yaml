@@ -29,6 +29,8 @@ spec:
 
             - name: TF_VAR_client_name
               value: {{ .keycloakClientID | quote }}
+            - name: TF_VAR_client_uuid
+              value: {{ .keycloakClientUUID | quote }}
             - name: TF_VAR_client_roles
               value: {{ .roles | toJson | squote }}
             - name: TF_VAR_client_secret

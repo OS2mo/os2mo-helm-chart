@@ -602,9 +602,17 @@ os2mo_smtp:
       memory: "512Mi"
       cpu: "500m"
 
-# External integrations to create a Keycloak token for, each should specify:
-# * `jobName`, e.g. "legoland-keycloak-token-creator"
-# * `keycloakClientID`
-# * `secret`, a name of a secret that must contain the key "client_secret"
-# * `roles`, RBAC roles for the integration builder, e.g. '["admin"]'
+# External integrations to create a Keycloak token for, e.g.:
+#
+# - jobName: legoland-keycloak-token-creator
+#   keycloakClientID: legoland
+#   keycloakClientUUID: d1fec000-baad-c0de-0000-004449504558
+#   roles: ["admin"]
+#   secret: aarhus-keycloak-token
+#
+# Where
+#  - `keycloakClientUUID` is a somewhat identifiable UUID.
+#    https://rammearkitektur.docs.magenta.dk/os2mo/tech-docs/audit-log.html
+#  - `secret` is the name of a secret that must contain the key `client_secret`.
+#  - `roles` are RBAC roles for the integration builder.
 externalIntegrations: []
