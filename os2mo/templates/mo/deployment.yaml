@@ -107,6 +107,11 @@ spec:
               value: {{ .Values.sdtool.enabled | quote }}
 
             # Never audit-log integrations that read all of MO
+            - name: ACCESS_LOG_NO_LOG_UUIDS
+              value: '["052ec901-baad-c0de-7371-6c6578706f72"]'  # sql export
+
+            # TODO: remove the old `AUDIT_READLOG_NO_LOG_UUIDS` when #64270 is
+            # deployed everywhere
             - name: AUDIT_READLOG_NO_LOG_UUIDS
               value: '["052ec901-baad-c0de-7371-6c6578706f72"]'  # sql export
 
