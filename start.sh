@@ -28,5 +28,13 @@ kubectl config use-context kind-os2mo
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml
 
 helm repo add mittwald https://helm.mittwald.de
-helm repo update
-helm upgrade --install kubernetes-secret-generator mittwald/kubernetes-secret-generator
+helm upgrade --install kubernetes-secret-generator \
+    --namespace=secret-generator \
+    --create-namespace \
+    mittwald/kubernetes-secret-generator
+
+helm repo add cnpg https://cloudnative-pg.github.io/charts
+helm upgrade --install cnpg \
+    --namespace=cnpg-system \
+    --create-namespace \
+    cnpg/cloudnative-pg
