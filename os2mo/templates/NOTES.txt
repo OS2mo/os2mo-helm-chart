@@ -6,14 +6,6 @@
 
 OS2mo is deployed! :)
 
-{{ if .Values.ingress.basic_auth }}
-Produce basic auth credentials using:
-```
-kubectl get secrets/mo-ingress-basic-auth-secret --template={{"{{"}}.data.username{{"}}"}} | base64 --decode
-kubectl get secrets/mo-ingress-basic-auth-secret --template={{"{{"}}.data.password{{"}}"}} | base64 --decode
-```
-{{ end }}
-
 Produce keycloak admin password with:
 ```
 kubectl get secrets/keycloak-admin-secret --template={{"{{"}}.data.admin_password{{"}}"}} | base64 --decode
