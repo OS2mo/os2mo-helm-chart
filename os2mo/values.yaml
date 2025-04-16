@@ -16,7 +16,6 @@ sentry:
 timezone: "Europe/Copenhagen"
 
 ingress:
-  # Must be 'nginx' for basic-auth to work
   # Must be 'nginx' for protection of Keycloak admin endpoints
   class: "nginx"
   # TLS hostname
@@ -345,6 +344,12 @@ sdtool_plus:
         repository: magentaaps/postgres-keycloak-init
         tag: 12.7-11.7
   email_secret_name: null
+  minisync:
+    ingress:
+      enabled: false
+      # https://kubernetes.github.io/ingress-nginx/examples/auth/basic/
+      basicAuthSecret: null
+
   environment: {}
   resources:
     requests:
