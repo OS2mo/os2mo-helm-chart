@@ -333,6 +333,8 @@ sdtool_plus:
   cronjob_trigger_path: "/trigger"
   cronjob_addr_enabled: false
   cronjob_addr_schedule: "30 6 * * *"
+  cronjob_sd_job_functions_enabled: false
+  cronjob_sd_job_functions_schedule: "0 12 * * *"
   rundb:
     name: sdtool_plus
     user: sdtool_plus

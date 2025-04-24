@@ -2,11 +2,11 @@
 #
 # SPDX-License-Identifier: MPL-2.0
 ---
-{{- if and (.Values.sdtool_plus.enabled) (.Values.sdtool_plus.cronjob_enabled) }}
+{{- if and (.Values.sdtool_plus.enabled) (.Values.sdtool_plus.cronjob_sd_job_functions_enabled) }}
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: cronjob-sdtool-plus
+  name: cronjob-sd-job-functions-sdtool-plus
   labels:
     app: sdtool-plus
   {{- with .Values.annotations }}
@@ -14,17 +14,17 @@ metadata:
   {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  schedule: {{ .Values.sdtool_plus.cronjob_schedule | quote }}
+  schedule: {{ .Values.sdtool_plus.cronjob_sd_job_functions_schedule | quote }}
   timeZone: {{ .Values.timezone | quote }}
   jobTemplate:
     spec:
       template:
         spec:
           containers:
-            - name: cronjob-sdtool-plus
+            - name: cronjob-sd-job-functions-sdtool-plus
               image: curlimages/curl
               command: ["/bin/sh","-c"]
-              args: [ 'curl --silent --show-error --fail-with-body -X POST "http://sdtool-plus-service:8000{{ .Values.sdtool_plus.cronjob_trigger_path }}"' ]
+              args: [ 'curl --silent --show-error --fail-with-body -X POST "http://sdtool-plus-service:8000/job-functions/sync"' ]
               resources:
                 requests:
                   memory: "64Mi"
