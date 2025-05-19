@@ -24,7 +24,7 @@ spec:
             - name: cronjob-sd-job-functions-sdtool-plus
               image: curlimages/curl
               command: ["/bin/sh","-c"]
-              args: [ 'curl --silent --show-error --fail-with-body -X POST "http://sdtool-plus-service:8000/job-functions/sync?institution_identifier=VJ"' ]
+              args: [ 'curl --silent --show-error --fail-with-body -X POST "http://sdtool-plus-service:8000/job-functions/sync?institution_identifier={{ .Values.sdtool_plus.cronjob_sd_job_functions_institution_identifier }}"' ]
               resources:
                 requests:
                   memory: "64Mi"
