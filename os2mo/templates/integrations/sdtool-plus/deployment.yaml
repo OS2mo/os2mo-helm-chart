@@ -55,21 +55,6 @@ spec:
                   name: sdtool-plus-client-secret
                   key: client_secret
 
-            # TODO: remove these ones when we have converted to use the
-            # FastRAMQPI GraphQL client everywhere in the application
-            - name: MORA_BASE
-              value: "http://mo-service:5000"
-            - name: AUTH_SERVER
-              value: "http://keycloak-service:8080/auth"
-            - name: AUTH_REALM
-              value: "mo"
-            - name: CLIENT_ID
-              value: "{{ $keycloak_client_id }}"
-            - name: CLIENT_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: sdtool-plus-client-secret
-                  key: client_secret
             - name: DB_HOST
               value: {{ .Values.database.host }}
 
