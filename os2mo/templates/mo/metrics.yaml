@@ -15,7 +15,7 @@ spec:
     - port: "5000"
       metricRelabelings:
         - action: keep
-          regex: "placeholder"
+          regex: "os2mo_events|os2mo_event_oldest|os2mo_event_acknowledged|os2mo_event_sent"
           sourceLabels:
             - __name__
 {{- end }}
