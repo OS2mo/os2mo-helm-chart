@@ -135,6 +135,10 @@ dipex:
     #   command:
     #     - "python"
     #     - "metacli.py"
+  extraEnv: null
+  # Consider using the "extraEnv" section instead of the old "settings". This will
+  # maybe require that the part of DIPEX you are going to use is rewritten to handle
+  # its reading of settings a bit differently
   settings:
     mox.base: "http://mo-service:5000/lora"
     mora.base: "http://mo-service:5000"
