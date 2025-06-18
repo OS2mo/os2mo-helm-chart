@@ -17,10 +17,10 @@ data:
   config: |
     facets:
       org_unit_address_type:
-        contact:
+        Contact:
           title: "Henvendelsessted"
           scope: "DAR"
-        location:
+        Location:
           title: "Lokation"
           scope: "DAR"
 {{- end }}
