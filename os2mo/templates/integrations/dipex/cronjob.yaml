@@ -35,8 +35,8 @@ spec:
                     key: client_secret
               - name: AUTH_SERVER
                 value: "http://keycloak-service:8080/auth"
-              {{- if and .Values.dipex .Values.dipex.extraEnv }}
-              {{ toYaml .Values.dipex.extraEnv | indent 14 | trim }}
+              {{- if and $.Values.dipex.extraEnv }}
+              {{ toYaml $.Values.dipex.extraEnv | indent 14 | trim }}
               {{- end }}
               - name: SAFETYNET_SFTP__PASSWORD
                 valueFrom:
