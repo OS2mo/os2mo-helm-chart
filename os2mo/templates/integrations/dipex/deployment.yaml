@@ -47,7 +47,7 @@ spec:
             - name: SAFETYNET_SFTP__PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: safetynet_secret
+                  name: safetynet-secret
                   key: sftp_password
                   optional: true
           volumeMounts:
