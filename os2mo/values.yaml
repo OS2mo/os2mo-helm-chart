@@ -129,9 +129,11 @@ dipex:
     tag: latest
   cronjobs: {}
     # Examples on the structure of defining a cronjob
-    # - schedule: "*/5 * * * *"
+    # - name: jobname1
+    #   schedule: "*/5 * * * *"
     #   command: ["python", "--version"]
-    # - schedule: "0 * * * *"
+    # - name: jobname2
+    #   schedule: "0 * * * *"
     #   command:
     #     - "python"
     #     - "metacli.py"

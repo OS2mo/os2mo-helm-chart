@@ -21,7 +21,7 @@ spec:
       template:
         spec:
           containers:
-            - name: cronjob-dipex-{{ $i }}
+            - name: cronjob-dipex-{{ hasKey $job "name" | ternary $job.name $i }}
               image: "{{ $.Values.dipex.image.registry }}/{{ $.Values.dipex.image.repository }}:{{ $.Values.dipex.image.tag }}"
               env:
               # Note that for now the settings below must be present both here and in the
