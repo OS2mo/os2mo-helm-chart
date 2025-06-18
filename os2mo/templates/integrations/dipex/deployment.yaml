@@ -30,6 +30,8 @@ spec:
           command: ["sleep"]
           args: ["infinity"]
           env:
+            # Note that for now the settings below must be present both here and in the
+            # DIPEX cronjob.yaml
             - name: CLIENT_ID
               value: "dipex"
             - name: CLIENT_SECRET
@@ -42,7 +44,7 @@ spec:
             {{- if .Values.dipex.extraEnv }}
             {{ toYaml .Values.dipex.extraEnv | indent 12 | trim }}
             {{- end }}
-            - name: safetynet_sftp_password
+            - name: SAFETYNET_SFTP__PASSWORD
               valueFrom:
                 secretRef:
                   name: safetynet_secret
