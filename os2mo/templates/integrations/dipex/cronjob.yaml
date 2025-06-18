@@ -24,6 +24,8 @@ spec:
             - name: cronjob-dipex-{{ $i }}
               image: "{{ $.Values.dipex.image.registry }}/{{ $.Values.dipex.image.repository }}:{{ $.Values.dipex.image.tag }}"
               env:
+              # Note that for now the settings below must be present both here and in the
+              # DIPEX deployment.yaml
               - name: CLIENT_ID
                 value: "dipex"
               - name: CLIENT_SECRET
@@ -33,7 +35,16 @@ spec:
                     key: client_secret
               - name: AUTH_SERVER
                 value: "http://keycloak-service:8080/auth"
-              command: 
+              {{- if .Values.dipex.extraEnv }}
+              {{ toYaml .Values.dipex.extraEnv | indent 14 | trim }}
+              {{- end }}
+              - name: SAFETYNET_SFTP__PASSWORD
+                valueFrom:
+                  secretRef:
+                    name: safetynet_secret
+                    key: sftp_password
+                    optional: true
+              command:
               {{- range  $job.command }}
                 -  {{ . | quote}}
               {{- end }}
