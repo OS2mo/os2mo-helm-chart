@@ -40,8 +40,8 @@ spec:
               {{- end }}
               - name: SAFETYNET_SFTP__PASSWORD
                 valueFrom:
-                  secretRef:
-                    name: safetynet_secret
+                  secretKeyRef:
+                    name: safetynet-secret
                     key: sftp_password
                     optional: true
               command:
