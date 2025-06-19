@@ -2,11 +2,12 @@
 #
 # SPDX-License-Identifier: MPL-2.0
 {{- range $i, $job := $.Values.dipex.cronjobs }}
+{{- $job_name := hasKey $job "name" | ternary $job.name $i }}
 ---
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: cronjob-dipex-{{ $i }}
+  name: cronjob-dipex-{{ $job_name }}
   labels:
     app: dipex-job
   {{- with $.Values.annotations }}
@@ -21,7 +22,7 @@ spec:
       template:
         spec:
           containers:
-            - name: cronjob-dipex-{{ hasKey $job "name" | ternary $job.name $i }}
+            - name: cronjob-dipex-{{ $job_name }}
               image: "{{ $.Values.dipex.image.registry }}/{{ $.Values.dipex.image.repository }}:{{ $.Values.dipex.image.tag }}"
               env:
               # Note that for now the settings below must be present both here and in the
