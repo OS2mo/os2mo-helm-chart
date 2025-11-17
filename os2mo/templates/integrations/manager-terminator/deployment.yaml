@@ -95,5 +95,7 @@ spec:
                 secretKeyRef:
                   name: manager-terminator-client-secret
                   key: client_secret
+            - name: TF_VAR_client_uuid
+              value: "3aca9ef1-baad-c0de-6d61-6e6167657274"
         {{ include "os2mo.wait-for-mo" . | nindent 8 }}
 {{- end }}
