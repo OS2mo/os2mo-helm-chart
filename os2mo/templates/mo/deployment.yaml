@@ -115,10 +115,6 @@ spec:
             - name: AUDIT_READLOG_NO_LOG_UUIDS
               value: '["052ec901-baad-c0de-7371-6c6578706f72"]'  # sql export
 
-            # TODO: remove this when #67035 is done.
-            - name: GUNICORN_WORKERS
-              value: '1'
-
             {{- range $name, $value := .Values.os2mo.environment }}
             - name: {{ $name }}
               value: {{ $value | quote }}
