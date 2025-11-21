@@ -1,0 +1,56 @@
+# SPDX-FileCopyrightText: Magenta ApS
+#
+# SPDX-License-Identifier: MPL-2.0
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: psql-deployment
+  labels:
+    app: psql
+  {{- with .Values.annotations }}
+  annotations:
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: psql
+  template:
+    metadata:
+      labels:
+        app: psql
+    spec:
+      containers:
+        - name: psql
+          image: "nixery.dev/shell/postgresql_17"
+          command: ["psql"]
+          env:
+            - name: PGHOST
+              value: {{ .Values.database.host }}
+            - name: PGUSER
+              value: "{{ .Values.database.user }}"
+            {{ if ne .Values.database.sslmode "" }}
+            - name: PGSSLMODE
+              value: {{ .Values.database.sslmode }}
+            {{ end }}
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  {{ if .Values.database.password_secret }}
+                  name: {{ .Values.database.password_secret }}
+                  {{ else }}
+                  name: mox-db-secret
+                  {{ end }}
+                  key: db_password
+            - name: PGDATABASE
+              value: {{ .Values.database.mox.name }}
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "100m"
+            limits:
+              memory: "1024Mi"
+              cpu: "1"
+      restartPolicy: Always
