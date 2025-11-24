@@ -24,7 +24,7 @@ spec:
     spec:
       containers:
         - name: psql
-          image: "nixery.dev/shell/postgresql_17"
+          image: "postgres:17.6"
           command: ["/bin/sleep", "inf"]
           env:
             - name: PGHOST
