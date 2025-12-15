@@ -115,6 +115,16 @@ spec:
             - name: AUDIT_READLOG_NO_LOG_UUIDS
               value: '["052ec901-baad-c0de-7371-6c6578706f72"]'  # sql export
 
+            {{ if .Values.sentry.environment }}
+            - name: SENTRY_DSN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.sentry.secret }}
+                  key: dsn
+            - name: SENTRY_ENVIRONMENT
+              value: {{ .Values.sentry.environment | quote }}
+            {{ end }}
+
             {{- range $name, $value := .Values.os2mo.environment }}
             - name: {{ $name }}
               value: {{ $value | quote }}
