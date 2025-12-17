@@ -1,0 +1,23 @@
+# SPDX-FileCopyrightText: Magenta ApS
+#
+# SPDX-License-Identifier: MPL-2.0
+---
+{{- if .Values.xflow.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: xflow-service
+  labels:
+    app: xflow
+  {{- with .Values.annotations }}
+  annotations:
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  selector:
+    app: xflow
+  ports:
+    - name: "8000"
+      port: 8000
+      targetPort: 8000
+{{- end }}

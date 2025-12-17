@@ -1,0 +1,78 @@
+# SPDX-FileCopyrightText: Magenta ApS
+#
+# SPDX-License-Identifier: MPL-2.0
+---
+{{- if .Values.xflow.enabled }}
+{{- $keycloak_client_id := "integration_xflow" }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: xflow
+  labels:
+    app: xflow
+  {{- with .Values.annotations }}
+  annotations:
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: xflow
+  template:
+    metadata:
+      labels:
+        app: xflow
+    spec:
+      containers:
+        - name: xflow
+          image: "{{ .Values.xflow.image.registry }}/{{ .Values.xflow.image.repository }}:{{ .Values.xflow.image.tag }}"
+          env:
+            - name: FASTRAMQPI__AMQP__URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.amqp.url_secret }}
+                  key: url
+            - name: FASTRAMQPI__CLIENT_ID
+              value: "{{ $keycloak_client_id }}"
+            - name: FASTRAMQPI__CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: xflow-client-secret
+                  key: client_secret
+            {{- if .Values.xflow.extraEnv }}
+            {{ toYaml .Values.xflow.extraEnv | indent 12 | trim }}
+            {{- end }}
+          ports:
+            - containerPort: 8000
+          resources:
+            {{- toYaml .Values.xflow.resources | nindent 12 }}
+      initContainers:
+        {{ include "os2mo.wait-for-keycloak" . | nindent 8 }}
+        - name: create-client-secret
+          image: "{{ .Values.keycloak.integrationbuilder.image.registry }}/{{ .Values.keycloak.integrationbuilder.image.repository }}:{{ .Values.keycloak.integrationbuilder.image.tag }}"
+          env:
+            {{ include "os2mo.keycloak_terraform_db_connection" .  | nindent 12 }}
+            - name: POSTGRES_SCHEMA_NAME
+              value: terraform_remote_state_xflow
+
+            # Keycloak REST connection
+            - name: TF_VAR_admin_password
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "os2mo.keycloak_admin_secret" . }}
+                  key: admin_password
+
+            # Configuration of the client
+            - name: TF_VAR_client_name
+              value: "{{ $keycloak_client_id }}"
+            - name: TF_VAR_client_roles
+              value: '["admin"]'
+            - name: TF_VAR_client_secret
+              valueFrom:
+                secretKeyRef:
+                  name: xflow-client-secret
+                  key: client_secret
+            - name: TF_VAR_client_uuid
+              value: "8f107777-baad-c0de-7866-6c6f77000000"
+{{- end }}

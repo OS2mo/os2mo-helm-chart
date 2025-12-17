@@ -615,6 +615,21 @@ os2mo_smtp:
       memory: "512Mi"
       cpu: "500m"
 
+xflow:
+  enabled: false
+  image:
+    registry: docker.io
+    repository: magentaaps/os2mo-xflow
+    tag: latest
+  extraEnv: []
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "2048Mi"
+      cpu: "2000m"
+
 # External integrations to create a Keycloak token for, e.g.:
 #
 # - jobName: legoland-keycloak-token-creator
