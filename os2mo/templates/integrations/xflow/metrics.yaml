@@ -1,0 +1,25 @@
+# SPDX-FileCopyrightText: Magenta ApS
+#
+# SPDX-License-Identifier: MPL-2.0
+---
+{{- if .Values.sdtool_plus.enabled }}
+{{- if .Values.metrics.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: sdtool-plus
+  labels:
+    app: sdtool-plus
+spec:
+  selector:
+    matchLabels:
+      app: sdtool-plus
+  endpoints:
+    - port: "8000"
+      metricRelabelings:
+        - action: keep
+          regex: "amqp_publish_last_published|amqp_publish|amqp_publish_exceptions|amqp_publish_inprogress|amqp_publish_seconds|dipex_.+"
+          sourceLabels:
+            - __name__
+{{- end }}
+{{- end }}
