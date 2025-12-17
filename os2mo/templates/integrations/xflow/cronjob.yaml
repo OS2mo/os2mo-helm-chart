@@ -2,29 +2,29 @@
 #
 # SPDX-License-Identifier: MPL-2.0
 ---
-{{- if and (.Values.sdtool_plus.enabled) (.Values.sdtool_plus.cronjob_enabled) }}
+{{- if and (.Values.xflow.enabled) (.Values.xflow.cronjob_enabled) }}
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: cronjob-sdtool-plus
+  name: cronjob-xflow
   labels:
-    app: sdtool-plus
+    app: xflow
   {{- with .Values.annotations }}
   annotations:
   {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  schedule: {{ .Values.sdtool_plus.cronjob_schedule | quote }}
+  schedule: {{ .Values.xflow.cronjob_schedule | quote }}
   timeZone: {{ .Values.timezone | quote }}
   jobTemplate:
     spec:
       template:
         spec:
           containers:
-            - name: cronjob-sdtool-plus
+            - name: cronjob-xflow
               image: curlimages/curl
               command: ["/bin/sh","-c"]
-              args: [ 'curl --silent --show-error --fail-with-body -X POST "http://sdtool-plus-service:8000{{ .Values.sdtool_plus.cronjob_trigger_path }}"' ]
+              args: [ 'curl --silent --show-error --fail-with-body -X POST "http://xflow-service:8000/report"' ]
               resources:
                 requests:
                   memory: "64Mi"
@@ -33,6 +33,6 @@ spec:
                   memory: "128Mi"
                   cpu: "10m"
           initContainers:
-            {{ include "os2mo.wait-for-sdtool-plus" . | nindent 12 }}
+            {{ include "os2mo.wait-for-xflow" . | nindent 12 }}
           restartPolicy: OnFailure
 {{- end }}

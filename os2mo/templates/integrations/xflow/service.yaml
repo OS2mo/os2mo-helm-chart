@@ -2,20 +2,20 @@
 #
 # SPDX-License-Identifier: MPL-2.0
 ---
-{{- if .Values.sdtool_plus.enabled }}
+{{- if .Values.xflow.enabled }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: sdtool-plus-service
+  name: xflow-service
   labels:
-    app: sdtool-plus
+    app: xflow
   {{- with .Values.annotations }}
   annotations:
   {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
   selector:
-    app: sdtool-plus
+    app: xflow
   ports:
     - name: "8000"
       port: 8000

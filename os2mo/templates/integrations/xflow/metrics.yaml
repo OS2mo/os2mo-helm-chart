@@ -2,18 +2,18 @@
 #
 # SPDX-License-Identifier: MPL-2.0
 ---
-{{- if .Values.sdtool_plus.enabled }}
+{{- if .Values.xflow.enabled }}
 {{- if .Values.metrics.enabled }}
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: sdtool-plus
+  name: xflow
   labels:
-    app: sdtool-plus
+    app: xflow
 spec:
   selector:
     matchLabels:
-      app: sdtool-plus
+      app: xflow
   endpoints:
     - port: "8000"
       metricRelabelings:
