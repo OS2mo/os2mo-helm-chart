@@ -618,6 +618,7 @@ os2mo_smtp:
 xflow:
   enabled: false
   cronjob_enabled: false
+  cronjob_schedule: "0 0 * * *"  # Once a day, at midnight
   image:
     registry: docker.io
     repository: magentaaps/os2mo-xflow
