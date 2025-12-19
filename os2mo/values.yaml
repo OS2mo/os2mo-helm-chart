@@ -617,6 +617,7 @@ os2mo_smtp:
 
 xflow:
   enabled: false
+  cronjob_enabled: false
   image:
     registry: docker.io
     repository: magentaaps/os2mo-xflow
