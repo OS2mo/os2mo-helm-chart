@@ -59,10 +59,10 @@ os2mo:
   resources:
     requests:
       memory: "512Mi"
-      cpu: "100m"
+      cpu: "200m"
     limits:
       memory: "2048Mi"
-      cpu: "1"
+      cpu: "1000m"
   headless: false
   keycloakRbacEnabled: true
   environment: {}
@@ -253,7 +253,7 @@ fkk:
       cpu: "100m"
     limits:
       memory: "512Mi"
-      cpu: "500m"
+      cpu: "1000m"
 
 omada:
   enabled: false
@@ -264,11 +264,11 @@ omada:
   extraEnv: null
   resources:
     requests:
-      memory: "256Mi"
+      memory: "512Mi"
       cpu: "100m"
     limits:
-      memory: "512Mi"
-      cpu: "500m"
+      memory: "1024Mi"
+      cpu: "1000m"
 
 sd_changed_at:
   enabled: false
@@ -321,11 +321,11 @@ sdtool:
   environment: {}
   resources:
     requests:
-      memory: "256Mi"
+      memory: "512Mi"
       cpu: "100m"
     limits:
-      memory: "512Mi"
-      cpu: "250m"
+      memory: "1024Mi"
+      cpu: "1000m"
 
 sdtool_plus:
   enabled: false
@@ -363,6 +363,9 @@ sdtool_plus:
     requests:
       memory: "128Mi"
       cpu: "100m"
+    limits:
+      memory: "1024Mi"
+      cpu: "1000m"
 
 initContainers:
   resources:
@@ -502,7 +505,7 @@ adguid_sync:
       cpu: "100m"
     limits:
       memory: "512Mi"
-      cpu: "250m"
+      cpu: "1000m"
   probes:
     liveness:
       periodSeconds: 10
@@ -522,7 +525,7 @@ ad_to_mo_sync:
       cpu: "100m"
     limits:
       memory: "512Mi"
-      cpu: "250m"
+      cpu: "1000m"
   probes:
     liveness:
       periodSeconds: 10
@@ -613,7 +616,7 @@ os2mo_smtp:
       cpu: "100m"
     limits:
       memory: "512Mi"
-      cpu: "500m"
+      cpu: "1000m"
 
 xflow:
   enabled: false
