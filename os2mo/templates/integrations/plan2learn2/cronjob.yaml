@@ -1,0 +1,45 @@
+# SPDX-FileCopyrightText: Magenta ApS
+#
+# SPDX-License-Identifier: MPL-2.0
+---
+{{- if .Values.plan2learn2.enabled }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: plan2learn2
+  labels:
+    app: plan2learn
+  {{- with $.Values.annotations }}
+  annotations:
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  schedule: {{ .Values.plan2learn2.cronjob_schedule | quote }}
+  timeZone: {{ $.Values.timezone | quote }}
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: plan2learn2
+              image: "{{ $.Values.plan2learn2.image.registry }}/{{ $.Values.plan2learn2.image.repository }}:{{ $.Values.plan2learn2.image.tag }}"
+              env:
+                - name: CLIENT_ID
+                  value: "dipex"
+                - name: CLIENT_SECRET
+                  valueFrom:
+                    secretKeyRef:
+                      name: keycloak-dipex-secret
+                      key: client_secret
+                - name: MO_URL
+                  value: "http://mo-service:5000"
+                - name: AUTH_SERVER
+                  value: "http://keycloak-service:8080/auth"
+                {{- if .Values.plan2learn2.extraEnv }}
+                {{ toYaml .Values.plan2learn2.extraEnv | indent 16 | trim }}
+                {{- end }}
+              command: ["poetry", "run", "python", "-m", "src.plan2learn2"]
+              resources:
+                {{- toYaml $.Values.plan2learn2.resources | nindent 16 }}
+          restartPolicy: OnFailure
+{{- end }}
