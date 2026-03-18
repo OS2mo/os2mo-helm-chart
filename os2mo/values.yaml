@@ -635,6 +635,22 @@ xflow:
       memory: "2048Mi"
       cpu: "2000m"
 
+plan2learn2:
+  enabled: false
+  cronjob_schedule: "15 16 * * *"  # Once a day, at 16:15
+  image:
+    registry: docker.io
+    repository: magentaaps/os2mo-reports
+    tag: latest
+  extraEnv: null
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "2048Mi"
+      cpu: "2000m"
+
 # External integrations to create a Keycloak token for, e.g.:
 #
 # - jobName: legoland-keycloak-token-creator
