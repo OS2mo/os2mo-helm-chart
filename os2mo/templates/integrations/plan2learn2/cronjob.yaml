@@ -38,7 +38,7 @@ spec:
                 {{- if .Values.plan2learn2.extraEnv }}
                 {{ toYaml .Values.plan2learn2.extraEnv | indent 16 | trim }}
                 {{- end }}
-              command: ["poetry", "run", "python", "-m", "src.plan2learn2"]
+              command: ["poetry", "run", "python", "-m", "plan2learn2"]
               resources:
                 {{- toYaml $.Values.plan2learn2.resources | nindent 16 }}
           restartPolicy: OnFailure
