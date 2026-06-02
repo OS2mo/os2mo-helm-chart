@@ -120,6 +120,7 @@ spec:
                   "create_event_namespace",
                   "fetch_event",
                   "reader",
+                  "send_event",
                   "service_api"
                 ]
             - name: TF_VAR_client_secret
@@ -163,5 +164,5 @@ spec:
             items:
               - key: config
                 path: config.yml
-          
+
 {{- end }}
