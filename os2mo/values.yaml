@@ -357,6 +357,7 @@ sdtool_plus:
       enabled: false
       # https://kubernetes.github.io/ingress-nginx/examples/auth/basic/
       basicAuthSecret: null
+      annotations: {}
 
   environment: {}
   resources:

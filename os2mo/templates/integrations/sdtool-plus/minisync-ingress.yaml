@@ -11,6 +11,9 @@ metadata:
     nginx.ingress.kubernetes.io/auth-type: basic
     nginx.ingress.kubernetes.io/auth-secret: {{ .Values.sdtool_plus.minisync.ingress.basicAuthSecret }}
     nginx.ingress.kubernetes.io/auth-realm: 'minisync'
+    {{- with .Values.sdtool_plus.minisync.ingress.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
 spec:
   ingressClassName: nginx
   tls:
