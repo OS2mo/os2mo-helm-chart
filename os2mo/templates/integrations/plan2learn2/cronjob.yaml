@@ -38,7 +38,7 @@ spec:
                 {{- if .Values.plan2learn2.extraEnv }}
                 {{ toYaml .Values.plan2learn2.extraEnv | indent 16 | trim }}
                 {{- end }}
-              command: ["poetry", "run", "python", "-m", "plan2learn2"]
+              args: ["plan2learn2"]
               volumeMounts:
                 - mountPath: /reports
                   name: report-storage
