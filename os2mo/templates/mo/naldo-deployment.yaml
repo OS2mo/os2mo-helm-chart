@@ -29,6 +29,15 @@ spec:
           env:
             - name: PUBLIC_BASE_URL
               value: "https://{{ .Values.ingress.hostname }}"
+            # Keycloak / OIDC configuration for the keycloak-js adapter.
+            {{- $is_http := empty .Values.ingress.tls_secret }}
+            {{- $protocol := ternary "http" "https" $is_http }}
+            - name: PUBLIC_KEYCLOAK_URL
+              value: "{{ $protocol }}://{{ .Values.ingress.hostname }}/auth/"
+            - name: PUBLIC_KEYCLOAK_REALM
+              value: "mo"
+            - name: PUBLIC_KEYCLOAK_CLIENT_ID
+              value: "mo-frontend"
             {{- range $name, $value := .Values.os2mo.naldo.environment }}
             - name: {{ $name }}
               value: {{ $value | quote }}
