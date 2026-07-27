@@ -3,12 +3,6 @@
 #
 # SPDX-License-Identifier: MPL-2.0
 {{- if .Values.os2mo_smtp.enabled }}
-
-# TODO: see https://git.magenta.dk/rammearkitektur/os2mo-helm-chart/-/merge_requests/142#note_140651
-{{- if not .Values.amqp.enabled }}
-  {{- fail "Must have AMQP enabled if os2mo-smtp is enabled" }}
-{{- end }}
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -42,11 +36,13 @@ spec:
                 secretKeyRef:
                   name: keycloak-dipex-secret
                   key: client_secret
+            {{ if .Values.amqp.enabled }}
             - name: FASTRAMQPI__AMQP__URL
               valueFrom:
                 secretKeyRef:
                   name: amqp-url-secret
                   key: url
+            {{ end }}
             {{ toYaml .Values.os2mo_smtp.extraEnv | indent 12 | trim }}
           resources:
             {{- toYaml .Values.os2mo_smtp.resources | nindent 12 }}
