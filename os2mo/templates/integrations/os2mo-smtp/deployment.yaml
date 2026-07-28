@@ -44,6 +44,18 @@ spec:
                   key: url
             {{ end }}
             {{ toYaml .Values.os2mo_smtp.extraEnv | indent 12 | trim }}
+              # Database
+            - name: FASTRAMQPI__DATABASE__USER
+              value: "smtp"
+            - name: FASTRAMQPI__DATABASE__PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: os2mo-smtp-database-secret
+                  key: database_password
+            - name: FASTRAMQPI__DATABASE__HOST
+              value: {{ .Values.database.host }}
+            - name: FASTRAMQPI__DATABASE__NAME
+              value: "smtp"
           resources:
             {{- toYaml .Values.os2mo_smtp.resources | nindent 12 }}
 {{- end }}
