@@ -80,8 +80,6 @@ os2mo:
       timeoutSeconds: 15
       failureThreshold: 3
 
-  newAMQPSubSystemEnabled: false
-
   frontend:
     replicaCount: 1
     image:

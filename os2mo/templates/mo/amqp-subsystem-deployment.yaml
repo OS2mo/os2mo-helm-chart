@@ -2,7 +2,6 @@
 #
 # SPDX-License-Identifier: MPL-2.0
 ---
-{{- if .Values.os2mo.newAMQPSubSystemEnabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -44,18 +43,6 @@ spec:
                   name: {{ .Values.database.mox.secret }}
                   key: db_password
 
-              # TODO: Remove AMQP_URL when everyone is on OS2mo v23.11.5
-            - name: AMQP_URL
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.amqp.url_secret }}
-                  key: url
-            - name: AMQP__URL
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.amqp.url_secret }}
-                  key: url
-
             # Keycloak
             - name: KEYCLOAK_SCHEMA
               value: http
@@ -79,4 +66,3 @@ spec:
           resources:
             {{- toYaml .Values.os2mo.resources | nindent 12 }}
       restartPolicy: Always
-{{- end }}
