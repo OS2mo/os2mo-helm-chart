@@ -58,4 +58,35 @@ spec:
               value: "smtp"
           resources:
             {{- toYaml .Values.os2mo_smtp.resources | nindent 12 }}
+      initContainers:
+        - name: os2mo-smtp-db-init
+          image: "{{ .Values.os2mo_smtp.database.init.image.registry }}/{{ .Values.os2mo_smtp.database.init.image.repository }}:{{ .Values.os2mo_smtp.database.init.image.tag }}"
+          env:
+            - name: POSTGRES_HOST
+              value: {{ .Values.database.host }}
+            - name: POSTGRES_USER
+              value: {{ .Values.database.user }}
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  {{ if .Values.database.password_secret }}
+                  name: {{ .Values.database.password_secret }}
+                  {{ else }}
+                  name: mox-db-secret
+                  {{ end }}
+                  key: db_password
+            # The ENVs below are named KEYCLOAK_... since we are currently using
+            # the Keycloak DB init-container. This will be fixed in
+            # https://redmine.magenta-aps.dk/issues/57967
+            - name: KEYCLOAK_DB_NAME
+              value: smtp
+            - name: KEYCLOAK_DB_USER
+              value: smtp
+            - name: KEYCLOAK_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: os2mo-smtp-database-secret
+                  key: database_password
+          resources:
+            {{- toYaml .Values.initContainers.resources | nindent 12 }}
 {{- end }}
