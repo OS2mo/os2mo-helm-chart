@@ -611,6 +611,14 @@ os2mo_smtp:
     repository: magentaaps/os2mo-smtp
     tag: latest
   extraEnv: []
+  database:
+    init:
+      image:
+        registry: docker.io
+        # We will use this for now
+        # (see https://redmine.magenta-aps.dk/issues/57967)
+        repository: magentaaps/postgres-keycloak-init
+        tag: 12.7-11.7
   resources:
     requests:
       memory: "256Mi"
