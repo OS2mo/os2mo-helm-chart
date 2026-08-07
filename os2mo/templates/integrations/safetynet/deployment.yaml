@@ -1,0 +1,78 @@
+# SPDX-FileCopyrightText: Magenta ApS
+#
+# SPDX-License-Identifier: MPL-2.0
+---
+{{- if .Values.safetynet.enabled }}
+{{- $keycloak_client_id := "integration_safetynet" }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: safetynet
+  labels:
+    app: safetynet
+  {{- with .Values.annotations }}
+  annotations:
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: safetynet
+  template:
+    metadata:
+      labels:
+        app: safetynet
+    spec:
+      containers:
+        - name: safetynet
+          image: "{{ .Values.safetynet.image.registry }}/{{ .Values.safetynet.image.repository }}:{{ .Values.safetynet.image.tag }}"
+          env:
+            - name: FASTRAMQPI__CLIENT_ID
+              value: "{{ $keycloak_client_id }}"
+            - name: FASTRAMQPI__CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: safetynet-client-secret
+                  key: client_secret
+            - name: SAFETYNET_SFTP__PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: safetynet-sftp-secret
+                  key: password
+            {{- if .Values.safetynet.extraEnv }}
+            {{ toYaml .Values.safetynet.extraEnv | indent 12 | trim }}
+            {{- end }}
+          ports:
+            - containerPort: 8000
+          resources:
+            {{- toYaml .Values.safetynet.resources | nindent 12 }}
+      initContainers:
+        {{ include "os2mo.wait-for-keycloak" . | nindent 8 }}
+        - name: create-client-secret
+          image: "{{ .Values.keycloak.integrationbuilder.image.registry }}/{{ .Values.keycloak.integrationbuilder.image.repository }}:{{ .Values.keycloak.integrationbuilder.image.tag }}"
+          env:
+            {{ include "os2mo.keycloak_terraform_db_connection" .  | nindent 12 }}
+            - name: POSTGRES_SCHEMA_NAME
+              value: terraform_remote_state_safetynet
+
+            # Keycloak REST connection
+            - name: TF_VAR_admin_password
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "os2mo.keycloak_admin_secret" . }}
+                  key: admin_password
+
+            # Configuration of the client
+            - name: TF_VAR_client_name
+              value: "{{ $keycloak_client_id }}"
+            - name: TF_VAR_client_roles
+              value: '["admin"]'
+            - name: TF_VAR_client_secret
+              valueFrom:
+                secretKeyRef:
+                  name: safetynet-client-secret
+                  key: client_secret
+            - name: TF_VAR_client_uuid
+              value: "5afe7911-baad-c0de-0000-736166657479"
+{{- end }}

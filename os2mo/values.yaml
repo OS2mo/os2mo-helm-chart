@@ -618,6 +618,23 @@ xflow:
       memory: "2048Mi"
       cpu: "2000m"
 
+safetynet:
+  enabled: false
+  cronjob_enabled: false
+  cronjob_schedule: "0 0 * * *"  # Once a day, at midnight
+  image:
+    registry: docker.io
+    repository: magentaaps/os2mo-safetynet
+    tag: latest
+  extraEnv: []
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "2048Mi"
+      cpu: "2000m"
+
 plan2learn2:
   enabled: false
   cronjob_schedule: "15 16 * * *"  # Once a day, at 16:15
