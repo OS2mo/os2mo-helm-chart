@@ -62,6 +62,11 @@ spec:
             {{- if .Values.amqp.enabled }}
             - name: AMQP_ENABLE
               value: "true"
+            - name: AMQP__URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.amqp.url_secret }}
+                  key: url
             {{- end }}
 
             {{- range $name, $value := .Values.os2mo.environment }}
