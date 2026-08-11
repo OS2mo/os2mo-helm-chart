@@ -59,6 +59,11 @@ spec:
             - name: KEYCLOAK_RBAC_ENABLED
               value: {{ .Values.os2mo.keycloakRbacEnabled | quote }}
 
+            {{- if .Values.amqp.enabled }}
+            - name: AMQP_ENABLE
+              value: "true"
+            {{- end }}
+
             {{- range $name, $value := .Values.os2mo.environment }}
             - name: {{ $name }}
               value: {{ $value | quote }}
