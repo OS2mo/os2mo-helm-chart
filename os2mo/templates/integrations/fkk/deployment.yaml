@@ -56,12 +56,6 @@ spec:
               value: "http://keycloak-service:8080/auth"
             - name: FASTRAMQPI__AUTH_REALM
               value: "mo"
-            # TODO: use separate integration AMQP user instead of global one
-            - name: FASTRAMQPI__AMQP__URL
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.amqp.url_secret }}
-                  key: url
               # Database
             - name: FASTRAMQPI__DATABASE__USER
               value: "fkk"
