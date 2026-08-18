@@ -46,16 +46,6 @@ spec:
             - name: SD_MONTHLY_HOURLY_DIVIDE
               value: "{{ .Values.sd_changed_at.sd_monthly_hourly_divide }}"
 
-            {{ if .Values.sentry.environment }}
-            - name: SENTRY_DSN
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.sentry.secret }}
-                  key: dsn
-            - name: SENTRY_ENVIRONMENT
-              value: {{ .Values.sentry.environment | quote }}
-            {{ end }}
-
             - name: MO_URL
               value: "http://mo-service:5000"
             - name: AUTH_SERVER

@@ -30,16 +30,6 @@ spec:
         - name: sdtool
           image: "{{ .Values.sdtool.image.registry }}/{{ .Values.sdtool.image.repository }}:{{ .Values.sdtool.image.tag }}"
           env:
-            {{ if .Values.sentry.environment }}
-            - name: SENTRY_DSN
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.sentry.secret }}
-                  key: dsn
-            - name: SENTRY_ENVIRONMENT
-              value: {{ .Values.sentry.environment | quote }}
-            {{ end }}
-
             - name: MORA_URL
               value: "http://mo-service:5000"
             - name: AUTH_SERVER

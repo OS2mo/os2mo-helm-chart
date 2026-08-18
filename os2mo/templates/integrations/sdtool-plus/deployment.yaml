@@ -28,16 +28,6 @@ spec:
         - name: sdtool-plus
           image: "{{ .Values.sdtool_plus.image.registry }}/{{ .Values.sdtool_plus.image.repository }}:{{ .Values.sdtool_plus.image.tag }}"
           env:
-            {{ if .Values.sentry.environment }}
-            - name: SENTRY_DSN
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.sentry.secret }}
-                  key: dsn
-            - name: SENTRY_ENVIRONMENT
-              value: {{ .Values.sentry.environment | quote }}
-            {{ end }}
-
             - name: FASTRAMQPI__AMQP__URL
               valueFrom:
                 secretKeyRef:

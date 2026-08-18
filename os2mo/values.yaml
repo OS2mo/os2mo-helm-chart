@@ -9,10 +9,6 @@ annotations:
 metrics:
   enabled: false
 
-sentry:
-  secret: sentry-secret
-  environment: null
-
 timezone: "Europe/Copenhagen"
 
 ingress:

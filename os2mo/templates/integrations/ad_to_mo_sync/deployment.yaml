@@ -30,16 +30,6 @@ spec:
         - name: ad-to-mo-sync
           image: "{{ .Values.ad_to_mo_sync.image.registry }}/{{ .Values.ad_to_mo_sync.image.repository }}:{{ .Values.ad_to_mo_sync.image.tag }}"
           env:
-            {{ if .Values.sentry.environment }}
-            - name: SENTRY_DSN
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.sentry.secret }}
-                  key: dsn
-            - name: SENTRY_ENVIRONMENT
-              value: {{ .Values.sentry.environment | quote }}
-            {{ end }}
-
             {{- if .Values.amqp.amqp_scheme }}
             - name: AMQP_SCHEME
               value: "{{ .Values.amqp.amqp_scheme }}"
