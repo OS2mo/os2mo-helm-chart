@@ -30,16 +30,6 @@ spec:
         - name: adguid-sync
           image: "{{ .Values.adguid_sync.image.registry }}/{{ .Values.adguid_sync.image.repository }}:{{ .Values.adguid_sync.image.tag }}"
           env:
-            {{ if .Values.sentry.environment }}
-            - name: SENTRY_DSN
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.sentry.secret }}
-                  key: dsn
-            - name: SENTRY_ENVIRONMENT
-              value: {{ .Values.sentry.environment | quote }}
-            {{ end }}
-
             {{- if .Values.amqp.amqp_scheme }}
             - name: AMQP_SCHEME
               value: "{{ .Values.amqp.amqp_scheme }}"

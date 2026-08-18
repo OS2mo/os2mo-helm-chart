@@ -50,15 +50,6 @@ spec:
 
             - name: ENABLE_HIDE_LOGIC
               value: "true"
-            {{ if .Values.sentry.environment }}
-            - name: SENTRY_DSN
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.sentry.secret }}
-                  key: dsn
-            - name: SENTRY_ENVIRONMENT
-              value: {{ .Values.sentry.environment | quote }}
-            {{ end }}
             {{- range $name, $value := .Values.orggatekeeper.environment }}
             - name: {{ $name }}
               value: {{ $value | quote }}

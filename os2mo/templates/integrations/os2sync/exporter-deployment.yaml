@@ -79,15 +79,6 @@ spec:
             {{- if .Values.os2sync.extraEnv }}
             {{ toYaml .Values.os2sync.extraEnv | indent 12 | trim }}
             {{- end }}
-            {{ if .Values.sentry.environment }}
-            - name: SENTRY_DSN
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.sentry.secret }}
-                  key: dsn
-            - name: SENTRY_ENVIRONMENT
-              value: {{ .Values.sentry.environment | quote }}
-            {{ end }}
           ports:
             - containerPort: 8000
           resources:

@@ -45,15 +45,6 @@ spec:
                 secretKeyRef:
                   name: {{ .Values.amqp.url_secret }}
                   key: url
-            {{ if .Values.sentry.environment }}
-            - name: SENTRY_DSN
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.sentry.secret }}
-                  key: dsn
-            - name: SENTRY_ENVIRONMENT
-              value: {{ .Values.sentry.environment | quote }}
-            {{ end }}
             {{- range $name, $value := .Values.manager_engagement_elevator.environment }}
             - name: {{ $name }}
               value: {{ $value | quote }}

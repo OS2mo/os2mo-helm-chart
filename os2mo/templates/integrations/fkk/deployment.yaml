@@ -33,15 +33,6 @@ spec:
           image: "{{ .Values.fkk.image.registry }}/{{ .Values.fkk.image.repository }}:{{ .Values.fkk.image.tag }}"
           env:
             # FastRAMQPI
-            {{ if .Values.sentry.environment }}
-            - name: SENTRY_DSN
-              valueFrom:
-                secretKeyRef:
-                  name: {{ .Values.sentry.secret }}
-                  key: dsn
-            - name: SENTRY_ENVIRONMENT
-              value: {{ .Values.sentry.environment | quote }}
-            {{ end }}
             # OS2mo
             - name: FASTRAMQPI__MO_URL
               value: "http://mo-service:5000"
