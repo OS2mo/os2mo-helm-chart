@@ -40,6 +40,7 @@ spec:
                 secretKeyRef:
                   name: safetynet-sftp-secret
                   key: password
+                  optional: true
             {{- if .Values.safetynet.extraEnv }}
             {{ toYaml .Values.safetynet.extraEnv | indent 12 | trim }}
             {{- end }}
