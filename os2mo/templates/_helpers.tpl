@@ -126,6 +126,10 @@ postgres://{{ .Values.database.keycloak.user }}:$(KEYCLOAK_DB_PASSWORD)@{{ .Valu
 {{ ( include "os2mo.wait-for-service" (dict "name" "xflow" "port" 8000 "url" "/" "resources" .Values.initContainers.resources "Values" .Values ) ) }}
 {{- end }}
 
+{{- define "os2mo.wait-for-safetynet" -}}
+{{ ( include "os2mo.wait-for-service" (dict "name" "safetynet" "port" 8000 "url" "/health/ready" "resources" .Values.initContainers.resources "Values" .Values ) ) }}
+{{- end }}
+
 {{- define "os2mo.wait-for-sd-changed-at" -}}
 {{ ( include "os2mo.wait-for-service" (dict "name" "sd-changed-at" "port" 8000 "url" "/" "resources" .Values.initContainers.resources "Values" .Values ) ) }}
 {{- end }}
