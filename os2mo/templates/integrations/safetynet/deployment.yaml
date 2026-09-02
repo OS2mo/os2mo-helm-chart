@@ -38,8 +38,8 @@ spec:
             - name: SAFETYNET_SFTP__PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: safetynet-sftp-secret
-                  key: password
+                  name: safetynet-secret
+                  key: sftp_password
                   optional: true
             {{- if .Values.safetynet.extraEnv }}
             {{ toYaml .Values.safetynet.extraEnv | indent 12 | trim }}
