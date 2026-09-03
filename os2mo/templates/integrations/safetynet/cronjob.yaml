@@ -24,7 +24,7 @@ spec:
             - name: cronjob-safetynet
               image: curlimages/curl
               command: ["/bin/sh","-c"]
-              args: [ 'curl --silent --show-error --fail-with-body -X POST "http://safetynet-service:8000/trigger"' ]
+              args: [ 'curl --silent --show-error --fail-with-body -X POST "http://safetynet-service:8000/trigger?only_adm_org=true"' ]
               resources:
                 requests:
                   memory: "64Mi"
