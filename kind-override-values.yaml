@@ -71,9 +71,6 @@ keycloak:
       memory: "4096Mi"
       cpu: "2000m"
 
-sdtool:
-  enabled: false
-
 database:
   mox:
     user: postgres

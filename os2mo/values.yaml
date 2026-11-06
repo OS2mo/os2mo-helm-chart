@@ -264,63 +264,6 @@ omada:
       memory: "1024Mi"
       cpu: "1000m"
 
-sd_changed_at:
-  enabled: false
-  init:
-    image:
-      registry: docker.io
-      repository: magentaaps/os2mo-sd-changed-at-init
-      tag: master
-  image:
-    registry: docker.io
-    repository: magentaaps/os2mo-sd-changed-at
-    tag: latest
-  db:
-    name: sd
-    user: sd
-    init:
-      image:
-        registry: docker.io
-        # We will use this for now
-        # (see https://redmine.magenta-aps.dk/issues/57967)
-        repository: magentaaps/postgres-keycloak-init
-        tag: 12.7-11.7
-  mora_base: http://mo-service:5000
-  sd_secret_name: sd-secret
-  sd_global_from_date: null
-  sd_job_function: null
-  sd_monthly_hourly_divide: null
-  environment: {}
-  cronjob_enabled: true
-  cronjob_schedule: "*/5 6-17 * * *"
-  # If set, we will save log files (rotating every day) in
-  # a PV for as many days as specified
-  number_of_days_to_persist_logs_to_files: null
-  resources:
-    requests:
-      memory: "256Mi"
-      cpu: "100m"
-    limits:
-      memory: "1024Mi"
-      cpu: "1000m"
-
-sdtool:
-  enabled: false
-  image:
-    registry: docker.io
-    repository: magentaaps/os2mo-http-trigger-sdtool
-    tag: latest
-  sd_secret_name: sd-secret
-  sd_too_deep: '[]'
-  environment: {}
-  resources:
-    requests:
-      memory: "512Mi"
-      cpu: "100m"
-    limits:
-      memory: "1024Mi"
-      cpu: "1000m"
-
 sdtool_plus:
   enabled: false
   image:
@@ -535,27 +478,6 @@ sql_export:
     limits:
       memory: "1024Mi"
       cpu: "1000m"
-
-manager_engagement_elevator:
-  enabled: false
-  image:
-    registry: docker.io
-    repository: magentaaps/os2mo-amqp-trigger-elevate-manager
-    tag: latest
-    pullPolicy: IfNotPresent
-  environment: {}
-  resources:
-    requests:
-      memory: "512Mi"
-      cpu: "250m"
-    limits:
-      memory: "1024Mi"
-      cpu: "1000m"
-  probes:
-    liveness:
-      periodSeconds: 10
-      timeoutSeconds: 1
-      failureThreshold: 3
 
 manager_terminator:
   enabled: false
