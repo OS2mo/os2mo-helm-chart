@@ -536,27 +536,6 @@ sql_export:
       memory: "1024Mi"
       cpu: "1000m"
 
-manager_engagement_elevator:
-  enabled: false
-  image:
-    registry: docker.io
-    repository: magentaaps/os2mo-amqp-trigger-elevate-manager
-    tag: latest
-    pullPolicy: IfNotPresent
-  environment: {}
-  resources:
-    requests:
-      memory: "512Mi"
-      cpu: "250m"
-    limits:
-      memory: "1024Mi"
-      cpu: "1000m"
-  probes:
-    liveness:
-      periodSeconds: 10
-      timeoutSeconds: 1
-      failureThreshold: 3
-
 manager_terminator:
   enabled: false
   image:
