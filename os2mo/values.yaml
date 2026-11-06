@@ -264,23 +264,6 @@ omada:
       memory: "1024Mi"
       cpu: "1000m"
 
-sdtool:
-  enabled: false
-  image:
-    registry: docker.io
-    repository: magentaaps/os2mo-http-trigger-sdtool
-    tag: latest
-  sd_secret_name: sd-secret
-  sd_too_deep: '[]'
-  environment: {}
-  resources:
-    requests:
-      memory: "512Mi"
-      cpu: "100m"
-    limits:
-      memory: "1024Mi"
-      cpu: "1000m"
-
 sdtool_plus:
   enabled: false
   image:

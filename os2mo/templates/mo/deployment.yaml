@@ -103,9 +103,6 @@ spec:
             - name: KEYCLOAK_RBAC_ENABLED
               value: {{ .Values.os2mo.keycloakRbacEnabled | quote }}
 
-            - name: CONFDB_SHOW_ORG_UNIT_BUTTON
-              value: {{ .Values.sdtool.enabled | quote }}
-
             # Never audit-log integrations that read all of MO
             - name: ACCESS_LOG_NO_LOG_UUIDS
               value: '["052ec901-baad-c0de-7371-6c6578706f72"]'  # sql export
@@ -299,8 +296,5 @@ spec:
                   key: client_secret
             - name: TF_VAR_client_uuid
               value: "d1fec000-baad-c0de-0000-004449504558"
-        {{- if .Values.sdtool.enabled }}
-        {{ include "os2mo.wait-for-sdtool" . | nindent 8 }}
-        {{- end }}
 
       restartPolicy: Always

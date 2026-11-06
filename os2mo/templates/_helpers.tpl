@@ -114,10 +114,6 @@ postgres://{{ .Values.database.keycloak.user }}:$(KEYCLOAK_DB_PASSWORD)@{{ .Valu
 {{ ( include "os2mo.wait-for-service" (dict "name" "mo" "port" 5000 "url" "/health/ready" "resources" .Values.initContainers.resources "Values" .Values ) ) }}
 {{- end }}
 
-{{- define "os2mo.wait-for-sdtool" -}}
-{{ ( include "os2mo.wait-for-service" (dict "name" "sdtool" "port" 80 "url" "/triggers" "resources" .Values.initContainers.resources "Values" .Values ) ) }}
-{{- end }}
-
 {{- define "os2mo.wait-for-sdtool-plus" -}}
 {{ ( include "os2mo.wait-for-service" (dict "name" "sdtool-plus" "port" 8000 "url" "/" "resources" .Values.initContainers.resources "Values" .Values ) ) }}
 {{- end }}
