@@ -1,0 +1,38 @@
+# SPDX-FileCopyrightText: Magenta ApS
+#
+# SPDX-License-Identifier: MPL-2.0
+---
+{{- if and .Values.mo_arbor.enabled .Values.mo_arbor.cronjob_enabled }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cronjob-mo-arbor
+  labels:
+    app: mo-arbor
+  {{- with .Values.annotations }}
+  annotations:
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  schedule: {{ .Values.mo_arbor.cronjob_schedule | quote }}
+  timeZone: {{ .Values.timezone | quote }}
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: cronjob-mo-arbor
+              image: curlimages/curl
+              command: ["/bin/sh","-c"]
+              args: [ 'curl --silent --show-error --fail-with-body -X POST "http://mo-arbor-service:8000/ingest"' ]
+              resources:
+                requests:
+                  memory: "64Mi"
+                  cpu: "5m"
+                limits:
+                  memory: "128Mi"
+                  cpu: "10m"
+          initContainers:
+            {{ include "os2mo.wait-for-mo-arbor" . | nindent 12 }}
+          restartPolicy: OnFailure
+{{- end }}

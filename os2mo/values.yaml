@@ -542,6 +542,41 @@ xflow:
       memory: "2048Mi"
       cpu: "2000m"
 
+mo_arbor:
+  enabled: false
+  cronjob_enabled: false
+  cronjob_schedule: "0 * * * *"  # Every hour
+  image:
+    registry: docker.io
+    repository: magentaaps/mo-arbor
+    tag: latest
+    pullPolicy: IfNotPresent
+  # The code systems to ingest, see mo-arbor's README, e.g. ["sor", "okosted"]
+  code_systems: []
+  extraEnv: []
+  database:
+    init:
+      image:
+        registry: docker.io
+        # We will use this for now
+        # (see https://redmine.magenta-aps.dk/issues/57967)
+        repository: magentaaps/postgres-keycloak-init
+        tag: 12.7-11.7
+    name: null
+    user: null
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "100m"
+    limits:
+      memory: "1024Mi"
+      cpu: "1000m"
+  probes:
+    liveness:
+      periodSeconds: 10
+      timeoutSeconds: 1
+      failureThreshold: 3
+
 safetynet:
   enabled: false
   cronjob_enabled: false
