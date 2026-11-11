@@ -1,0 +1,136 @@
+# SPDX-FileCopyrightText: Magenta ApS
+#
+# SPDX-License-Identifier: MPL-2.0
+---
+{{- if .Values.mo_arbor.enabled }}
+{{- if not .Values.mo_arbor.code_systems }}
+  {{- fail "Must have mo_arbor.code_systems set if mo-arbor is enabled" }}
+{{- end }}
+{{- if or (not .Values.mo_arbor.database.name) (not .Values.mo_arbor.database.user) }}
+  {{- fail "Must have mo_arbor.database.name and mo_arbor.database.user set" }}
+{{- end }}
+{{- $keycloak_client_id := "integration_mo_arbor" }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mo-arbor
+  labels:
+    app: mo-arbor
+  {{- with .Values.annotations }}
+  annotations:
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mo-arbor
+  template:
+    metadata:
+      labels:
+        app: mo-arbor
+    spec:
+      containers:
+        - name: mo-arbor
+          image: "{{ .Values.mo_arbor.image.registry }}/{{ .Values.mo_arbor.image.repository }}:{{ .Values.mo_arbor.image.tag }}"
+          imagePullPolicy: {{ .Values.mo_arbor.image.pullPolicy }}
+          env:
+            # OS2mo
+            - name: FASTRAMQPI__CLIENT_ID
+              value: "{{ $keycloak_client_id }}"
+            - name: FASTRAMQPI__CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: mo-arbor-client-secret
+                  key: client_secret
+            # Database
+            - name: FASTRAMQPI__DATABASE__USER
+              value: {{ .Values.mo_arbor.database.user | quote }}
+            - name: FASTRAMQPI__DATABASE__PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mo-arbor-database-secret
+                  key: database_password
+            - name: FASTRAMQPI__DATABASE__HOST
+              value: {{ .Values.database.host | quote }}
+            - name: FASTRAMQPI__DATABASE__NAME
+              value: {{ .Values.mo_arbor.database.name | quote }}
+            # mo-arbor
+            - name: CODE_SYSTEMS
+              value: {{ .Values.mo_arbor.code_systems | toJson | quote }}
+            # Extras
+            {{- if .Values.mo_arbor.extraEnv }}
+            {{ toYaml .Values.mo_arbor.extraEnv | indent 12 | trim }}
+            {{- end }}
+          ports:
+            - containerPort: 8000
+          resources:
+            {{- toYaml .Values.mo_arbor.resources | nindent 12 }}
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: 8000
+            periodSeconds: {{ .Values.mo_arbor.probes.liveness.periodSeconds }}
+            timeoutSeconds: {{ .Values.mo_arbor.probes.liveness.timeoutSeconds }}
+            failureThreshold: {{ .Values.mo_arbor.probes.liveness.failureThreshold }}
+      initContainers:
+        - name: mo-arbor-db-init
+          image: "{{ .Values.mo_arbor.database.init.image.registry }}/{{ .Values.mo_arbor.database.init.image.repository }}:{{ .Values.mo_arbor.database.init.image.tag }}"
+          env:
+            - name: POSTGRES_HOST
+              value: {{ .Values.database.host | quote }}
+            - name: POSTGRES_USER
+              value: {{ .Values.database.user | quote }}
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  {{ if .Values.database.password_secret }}
+                  name: {{ .Values.database.password_secret }}
+                  {{ else }}
+                  name: mox-db-secret
+                  {{ end }}
+                  key: db_password
+            # The ENVs below are named KEYCLOAK_... since we are currently using
+            # the Keycloak DB init-container. This will be fixed in
+            # https://redmine.magenta-aps.dk/issues/57967
+            - name: KEYCLOAK_DB_NAME
+              value: {{ .Values.mo_arbor.database.name | quote }}
+            - name: KEYCLOAK_DB_USER
+              value: {{ .Values.mo_arbor.database.user | quote }}
+            - name: KEYCLOAK_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mo-arbor-database-secret
+                  key: database_password
+          resources:
+            {{- toYaml .Values.initContainers.resources | nindent 12 }}
+        {{ include "os2mo.wait-for-keycloak" . | nindent 8 }}
+        - name: create-client-secret
+          image: "{{ .Values.keycloak.integrationbuilder.image.registry }}/{{ .Values.keycloak.integrationbuilder.image.repository }}:{{ .Values.keycloak.integrationbuilder.image.tag }}"
+          imagePullPolicy: {{ .Values.keycloak.integrationbuilder.image.pullPolicy }}
+          env:
+            {{ include "os2mo.keycloak_terraform_db_connection" .  | nindent 12 }}
+            - name: POSTGRES_SCHEMA_NAME
+              value: terraform_remote_state_mo_arbor
+
+            # Keycloak REST connection
+            - name: TF_VAR_admin_password
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "os2mo.keycloak_admin_secret" . }}
+                  key: admin_password
+
+            # Configuration of the client
+            - name: TF_VAR_client_name
+              value: "{{ $keycloak_client_id }}"
+            - name: TF_VAR_client_roles
+              value: '["admin", "service_api"]'
+            - name: TF_VAR_client_secret
+              valueFrom:
+                secretKeyRef:
+                  name: mo-arbor-client-secret
+                  key: client_secret
+            - name: TF_VAR_client_uuid
+              value: "a7b07000-baad-c0de-0000-006172626f72"
+        {{ include "os2mo.wait-for-mo" . | nindent 8 }}
+{{- end }}

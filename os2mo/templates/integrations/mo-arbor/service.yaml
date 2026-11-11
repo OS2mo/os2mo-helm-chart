@@ -1,0 +1,23 @@
+# SPDX-FileCopyrightText: Magenta ApS
+#
+# SPDX-License-Identifier: MPL-2.0
+---
+{{- if .Values.mo_arbor.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: mo-arbor-service
+  labels:
+    app: mo-arbor
+  {{- with .Values.annotations }}
+  annotations:
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  selector:
+    app: mo-arbor
+  ports:
+    - name: "8000"
+      port: 8000
+      targetPort: 8000
+{{- end }}
