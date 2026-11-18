@@ -160,7 +160,7 @@ keycloak:
   image:
     registry: docker.io
     repository: magentaaps/os2mo-keycloak
-    tag: 33.4.1
+    tag: latest
   init:
     image:
       registry: docker.io
