@@ -111,7 +111,7 @@ spec:
                   name: orgviewer-med-client-secret
                   key: client_secret
             - name: TF_VAR_client_uuid
-              value: "04c71e70-baad-c0de-6F72-677669657761"
+              value: "04c71e70-baad-c0de-6f72-677669657761"
           resources:
             {{- toYaml .Values.initContainers.resources | nindent 12 }}
       restartPolicy: Always
