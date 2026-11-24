@@ -544,8 +544,10 @@ xflow:
 
 mo_arbor:
   enabled: false
-  cronjob_enabled: false
-  cronjob_schedule: "0 * * * *"  # Every hour
+  ingest_cronjob_enabled: false
+  ingest_cronjob_schedule: "0 2 * * *"
+  report_cronjob_enabled: false
+  report_cronjob_schedule: "0 6 * * *"
   image:
     registry: docker.io
     repository: magentaaps/mo-arbor
