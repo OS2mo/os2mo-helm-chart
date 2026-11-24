@@ -7,7 +7,7 @@
 {{- if not .Values.amqp.enabled }}
   {{- fail "Must have AMQP enabled if fkk is enabled" }}
 {{- end }}
-{{- $keycloak_client_id := "integration_fkk" }}
+{{- $keycloak_client_id := "fkk" }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
