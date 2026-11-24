@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MPL-2.0
 ---
 {{- if .Values.sdtool_plus.enabled }}
-{{- $keycloak_client_id := "integration_sdtool_plus" }}
+{{- $keycloak_client_id := "sdtool_plus" }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:

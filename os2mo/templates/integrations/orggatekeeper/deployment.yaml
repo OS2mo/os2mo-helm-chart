@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MPL-2.0
 ---
 {{- if .Values.orggatekeeper.enabled }}
-{{- $keycloak_client_id := "integration_orggatekeeper" }}
+{{- $keycloak_client_id := "orggatekeeper" }}
 # TODO: see https://git.magenta.dk/rammearkitektur/os2mo-helm-chart/-/merge_requests/142#note_140651
 {{- if not .Values.amqp.enabled }}
   {{- fail "Must have AMQP enabled if orggatekeeper is enabled" }}

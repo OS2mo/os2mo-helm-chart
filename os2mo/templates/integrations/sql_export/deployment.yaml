@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MPL-2.0
 ---
 {{- if .Values.sql_export.enabled }}
-{{- $keycloak_client_id := "integration_sql_export" }}
+{{- $keycloak_client_id := "sql_export" }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:

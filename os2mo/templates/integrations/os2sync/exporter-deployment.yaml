@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MPL-2.0
 ---
 {{- if .Values.os2sync.enabled }}
-{{- $keycloak_client_id := "integration_os2sync_export" }}
+{{- $keycloak_client_id := "os2sync_export" }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:

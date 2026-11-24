@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MPL-2.0
 ---
 {{- if .Values.ad_to_mo_sync.enabled }}
-{{- $keycloak_client_id := "integration_ad_to_mo_sync" }}
+{{- $keycloak_client_id := "ad2mo_sync" }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
