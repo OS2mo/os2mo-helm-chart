@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MPL-2.0
 ---
 {{- if .Values.xflow.enabled }}
-{{- $keycloak_client_id := "integration_xflow" }}
+{{- $keycloak_client_id := "xflow" }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
