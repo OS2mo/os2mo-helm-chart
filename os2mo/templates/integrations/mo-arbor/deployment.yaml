@@ -9,7 +9,7 @@
 {{- if or (not .Values.mo_arbor.database.name) (not .Values.mo_arbor.database.user) }}
   {{- fail "Must have mo_arbor.database.name and mo_arbor.database.user set" }}
 {{- end }}
-{{- $keycloak_client_id := "integration_mo_arbor" }}
+{{- $keycloak_client_id := "mo_arbor" }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
